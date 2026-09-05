@@ -1,10 +1,9 @@
-// HTML to'liq yuklangandan keyin ishlash kafolati
 document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) tg.expand();
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
-    let user_name = tg?.initDataUnsafe?.user?.first_name || "Player";
+    let user_id = tg?.initDataUnsafe?.user?.id || 0;
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
@@ -54,55 +53,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 scoreVal.innerText = score;
 
-                try {
-                    if (tg && tg.initDataUnsafe?.query_id) {
-                        tg.sendData(JSON.stringify({ score: score, perfects: perfects }));
-                    }
-                } catch(e) {
-                    console.log("Telegram API Sync skipped");
+                // Eng asosiysi: Ballar yig'ilganda Python bot orqali Telegram bazasiga yuboriladi
+                if (addedScore > 0 && tg) {
+                    tg.sendData(JSON.stringify({ score: score, perfects: perfects }));
                 }
             }
         });
     }
 
-    // Navigatsiya Tabs
+    // Navigatsiya Boshqaruvi
     const tabGame = document.getElementById('tab-game');
     const tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view');
     const rankView = document.getElementById('rank-view');
-    const subPerfects = document.getElementById('sub-perfects');
-    const subScores = document.getElementById('sub-scores');
 
     if (tabGame && tabRank) {
-        tabGame.addEventListener('click', () => toggleTab('game'));
-        tabRank.addEventListener('click', () => { toggleTab('rank'); loadMockLeaderboard('perfects'); });
-    }
-
-    if (subPerfects && subScores) {
-        subPerfects.addEventListener('click', () => { subPerfects.classList.add('active'); subScores.classList.remove('active'); loadMockLeaderboard('perfects'); });
-        subScores.addEventListener('click', () => { subScores.classList.add('active'); subPerfects.classList.remove('active'); loadMockLeaderboard('scores'); });
-    }
-
-    function toggleTab(type) {
-        tabGame.classList.toggle('active', type==='game');
-        tabRank.classList.toggle('active', type==='rank');
-        gameView.style.display = type==='game' ? 'flex' : 'none';
-        rankView.classList.toggle('active', type==='rank');
-    }
-
-    function loadMockLeaderboard(type) {
-        const listEl = document.getElementById('leaderboard');
-        if (!listEl) return;
-        listEl.innerHTML = '';
-        let data = type === 'perfects' ? 
-            [{name: user_name + " (You)", val: perfects + " times"}, {name: "Alex_Pro", val: "4 times"}, {name: "Cyber_King", val: "2 times"}] :
-            [{name: user_name + " (You)", val: score + " pts"}, {name: "Alex_Pro", val: "24 pts"}, {name: "Cyber_King", val: "15 pts"}];
-        
-        data.forEach((p, i) => {
-            let li = document.createElement('li'); li.className = 'leaderboard-item';
-            li.innerHTML = `<span class="rank">#${i+1}</span><span>${p.name}</span><strong>${p.val}</strong>`;
-            listEl.appendChild(li);
+        tabGame.addEventListener('click', () => {
+            tabGame.classList.add('active'); tabRank.classList.remove('active');
+            gameView.style.display = 'flex'; rankView.style.display = 'none';
         });
-        document.getElementById('my-rank').innerText = `Your Rank: Top-1`;
+        tabRank.addEventListener('click', () => {
+            tabRank.classList.add('active'); tabGame.classList.remove('active');
+            gameView.style.display = 'none'; rankView.style.display = 'flex';
+            
+            // Soxta reyting o'chirildi! Foydalanuvchiga bot orqali reytingni ko'rish ko'rsatmasi beriladi
+            const listEl = document.getElementById('leaderboard');
+            if (listEl) {
+                listEl.innerHTML = `
+                    <div style="text-align:center; padding:20px; font-size:14px; color:#718096;">
+                        📊 Global & Group Leaderboards are actively synced! <br><br>
+                        To see the real-time ranking, close this window and use the <b>🏆 Leaderboard</b> button in the bot chat.
+                    </div>`;
+            }
+            document.getElementById('my-rank').innerText = `Your Score Saved Online!`;
+        });
     }
 });
