@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Zagra Timer | Glassmorphism Pro</title>
-    <!-- Telegram WebApp uchun rasmiy eng muhim script -->
     <script src="https://telegram.org"></script>
     <style>
         :root {
@@ -70,40 +69,39 @@
 
     <div id="game-view" style="width: 100%; display: flex; flex-direction: column; height: 100%;">
         <div class="header-stats">
-            <div class="stat-box"><div class="stat-label">💎 BALLAR</div><div id="score-val" class="stat-value">0</div></div>
-            <div class="stat-box"><div class="stat-label">🎯 1.000 QIROL</div><div id="perfect-val" class="stat-value">0</div></div>
+            <div class="stat-box"><div class="stat-label">💎 SCORES</div><div id="score-val" class="stat-value">0</div></div>
+            <div class="stat-box"><div class="stat-label">🎯 1.000 KINGS</div><div id="perfect-val" class="stat-value">0</div></div>
         </div>
         <div class="timer-container">
-            <div class="glass-board"><div id="timer">0.000</div><div id="feedback">START BOSING</div></div>
+            <div class="glass-board"><div id="timer">0.000</div><div id="feedback">PRESS START</div></div>
             <button id="action-btn" class="stop-btn">START</button>
         </div>
     </div>
 
     <div id="rank-view" class="view-panel">
         <div class="sub-tabs">
-            <button id="sub-perfects" class="sub-btn active">🎯 1.000 Qirollari</button>
-            <button id="sub-scores" class="sub-btn">💎 Umumiy Ballar</button>
+            <button id="sub-perfects" class="sub-btn active">🎯 1.000 Kings</button>
+            <button id="sub-scores" class="sub-btn">💎 Total Scores</button>
         </div>
         <ul id="leaderboard" class="leaderboard-list"></ul>
-        <div id="my-rank" class="my-absolute-rank">Sizning o'rningiz: Yuklanmoqda...</div>
+        <div id="my-rank" class="my-absolute-rank">Your Rank: Loading...</div>
     </div>
 
     <div class="nav-tabs">
-        <button id="tab-game" class="tab-btn active">🎮 O'YIN</button>
-        <button id="tab-rank" class="tab-btn">🏆 REYTING</button>
+        <button id="tab-game" class="tab-btn active">🎮 GAME</button>
+        <button id="tab-rank" class="tab-btn">🏆 RANKING</button>
     </div>
 
     <script>
-        // Telegram WebApp yuklanishi
         const tg = window.Telegram.WebApp;
-        tg.expand(); // O'yinni to'liq ekranga ochish
+        tg.expand();
 
         let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
         let user_id = tg.initDataUnsafe?.user?.id || 0;
-        let user_name = tg.initDataUnsafe?.user?.first_name || "O'yinchi";
-        let chat_id = tg.initDataUnsafe?.chat?.id || 0; // Guruh IDsi (agar guruhdan ochilsa)
+        let user_name = tg.initDataUnsafe?.user?.first_name || "Player";
+        let chat_id = tg.initDataUnsafe?.chat?.id || 0;
 
-        // Workers serverimiz manzili (Buni 2-qadamda ochamiz)
+        // Auto-generated Worker URL from your Cloudflare project
         const BACKEND_URL = "https://workers.dev";
 
         const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
@@ -116,12 +114,12 @@
         }
 
         actionBtn.addEventListener('click', () => {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); // Telegram jismoniy tebranishi
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
             if (!isRunning) {
                 isRunning = true; actionBtn.innerText = "STOP";
                 actionBtn.style.background = "linear-gradient(90deg, #00f0ff, #0072ff)";
-                feedbackEl.innerText = "DIQQAT QILING..."; startTime = performance.now();
+                feedbackEl.innerText = "FOCUS NOW..."; startTime = performance.now();
                 timerInterval = setInterval(updateTimer, 1);
             } else {
                 isRunning = false; clearInterval(timerInterval);
@@ -134,17 +132,16 @@
                 if (finalTime === 1.000) {
                     perfects++; addedScore = 10; isPerfect = 1;
                     perfectVal.innerText = perfects;
-                    feedbackEl.innerText = "🎯 PERFECT! +10 BALL"; feedbackEl.style.color = "var(--neon-cyan)";
+                    feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "var(--neon-cyan)";
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
-                    feedbackEl.innerText = "🔥 DAXSHAT YAQIN! +1 BALL"; feedbackEl.style.color = "#0072ff";
+                    feedbackEl.innerText = "🔥 SO CLOSE! +1 SCORE"; feedbackEl.style.color = "#0072ff";
                 } else {
-                    feedbackEl.innerText = "❌ O'XSHAMADI!"; feedbackEl.style.color = "var(--neon-pink)";
+                    feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "var(--neon-pink)";
                 }
                 score += addedScore; scoreVal.innerText = score;
 
-                // Haqiqiy ma'lumotni serverga yuborish logikasi (JavaScript Fetch)
                 if(user_id) {
                     fetch(`${BACKEND_URL}/save`, {
                         method: 'POST',
@@ -155,5 +152,5 @@
             }
         });
 
-        // Tabs almashishi
         document.getElementById('tab-game').addEventListener('click', () => { toggleTab('game'); });
+        document.getElementById('tab-rank').addEventListener('click', () => { toggleTab('rank'); loadLeaderboard('perfects'); });
