@@ -1,17 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
-    if (tg) tg.expand();
+    if (tg) {
+        tg.expand();
+        tg.ready(); // Telegram WebApp-ni rasman tayyor holatga keltirish
+    }
 
-    // Telegram Inline Game seansidan o'yinchining haqiqiy ismi va unikal ID raqamini aniqlash
-    let user_id = String(tg?.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random() * 1000));
+    // TELEGRAM WEBAPP LOGIN API: Har qanday xavfsizlik cheklovlarisiz haqiqiy ism va IDni tortish
+    let initDataUser = tg?.initDataUnsafe?.user;
+    let user_id = String(initDataUser?.id || "guest_" + Math.floor(Math.random() * 1000));
     
-    // Haqiqiy ism va familiyani birlashtirib olish algoritmi
-    let first = tg?.initDataUnsafe?.user?.first_name || "";
-    let last = tg?.initDataUnsafe?.user?.last_name || "";
-    let user_name = (first + " " + last).trim() || tg?.initDataUnsafe?.user?.username || "Cyber_Pilot";
+    let first = initDataUser?.first_name || "";
+    let last = initDataUser?.last_name || "";
+    let user_name = (first + " " + last).trim() || initDataUser?.username || "Cyber_Pilot";
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
 
+    // Sizning 100% ishlaydigan rasmiy Supabase bulutli serveringiz
     const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co";
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
@@ -25,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
 
-    // 1. O'yin ochilishi bilan ushbu o'yinchining aniq ballarini bazadan yuklab olish
+    // 1. O'yin ochilishi bilan ushbu o'yinchining aniq eski ballarini PostgreSQL bazasidan yuklab olish
     fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
         .then(res => res.json())
         .then(data => {
@@ -74,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // 2. HAQIQIY TELEGRAM ISMI BILAN POSTGRESQL BAZASIGA YOZISH
+                // 2. MA'LUMOTLARNI SUPABASE POSTGRESQL BAZASIGA ABADIY MUHRLASH (UPSERT REQ)
                 fetch(`${SUPABASE_URL}/rest/v1/players`, {
                     method: 'POST',
                     headers: headers,
@@ -84,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. JONLI REYTING PANEL HISOBLASHI
+    // 3. JONLI REYTING JADVALI (2 XIL REYTING)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
@@ -109,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global database...</li>';
+        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global data...</li>';
 
         let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
         
@@ -134,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
             document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
         }).catch(err => {
-            listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#ff007f;">Connection Error. Reset cache.</li>';
+            listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#ff007f;">Connection Error.</li>';
         });
     }
 });
