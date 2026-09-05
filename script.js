@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNTNING DOIMIYLIK KAFOLATI
+    // AKKAUNTNING DOIMIYLIK KAFOLATI: Keshda ID bo'lsa qat'iy ushlab qoladi!
     let user_id = localStorage.getItem("zagra_final_user_id");
     if (!user_id) {
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
-    const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co"; 
+    const SUPABASE_URL = "https://supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
     const ADSGRAM_BLOCK_ID = "4829"; 
@@ -35,8 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
     const currentNameDisplay = document.getElementById('current-name-display'), editProfileTrigger = document.getElementById('edit-profile-trigger');
+    const enterArenaBtn = document.getElementById('enter-arena-btn'); // Enter Arena tugmasi
 
-    // Ism mavjudligini qat'iy tekshirish va oynani boshqarish
+    // Ism mavjudligini qat'iy tekshirish va login oynasini boshqarish
     if (!user_name) {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
@@ -45,23 +46,52 @@ document.addEventListener("DOMContentLoaded", () => {
         loadUserData();
     }
 
+    // START GAME / RO'YXATDAN O'TISH TUGMASI
     if (startGameBtn) {
         startGameBtn.addEventListener('click', () => {
-            let inputVal = nicknameInput.value.trim();
-            if (inputVal.length < 2) {
-                alert("Nickname must be at least 2 characters!");
-                return;
-            }
-            user_name = inputVal;
-            localStorage.setItem("zagra_user_nickname", user_name);
-            if (currentNameDisplay) currentNameDisplay.innerText = user_name;
-            if (loginScreen) loginScreen.style.display = "none";
-            
-            showAdBanner();
-            saveUserData();
+            processLoginOrArena();
         });
     }
 
+    // ENTER ARENA TUGMASI ISHLASHI
+    if (enterArenaBtn) {
+        enterArenaBtn.addEventListener('click', () => {
+            processLoginOrArena();
+        });
+    }
+
+    // Ism kiritish va o'yinga kirish umumiy mantiqiy funksiyasi
+    function processLoginOrArena() {
+        let inputVal = nicknameInput ? nicknameInput.value.trim() : "";
+        
+        // Agar keshda ismi yo'q bo'lsa va input ham bo'sh bo'lsa - ogohlantirish beramiz
+        if (!user_name && inputVal.length < 2) {
+            alert("Please enter a nickname (at least 2 characters)!");
+            return;
+        }
+
+        // Agar yangi ism kiritilgan bo'lsa, uni saqlaymiz
+        if (inputVal.length >= 2) {
+            user_name = inputVal;
+            localStorage.setItem("zagra_user_nickname", user_name);
+        }
+
+        if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+        if (loginScreen) loginScreen.style.display = "none";
+        
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+        
+        // Ekranlarni to'g'irlaymiz
+        if (gameView) gameView.style.display = 'flex';
+        if (rankView) rankView.style.display = 'none';
+        if (tabGame) tabGame.classList.add('active');
+        if (tabRank) tabRank.classList.remove('active');
+
+        showAdBanner();
+        saveUserData();
+    }
+
+    // PROFILE TAHRIRLASH TUGMASI BOSILGANDA
     if (editProfileTrigger) {
         editProfileTrigger.addEventListener('click', () => {
             if (nicknameInput) nicknameInput.value = user_name;
@@ -69,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // XAVFSIZLIK: Agar login ekranda tasodifan "X" yoki yopish bosilsa, eski ismni tiklaydi
+    // XAVFSIZLIK KAFOLATI: Agar oynani shunchaki yopib yuborsa eski ismni qaytaradi, keshni buzmaydi
     window.addEventListener('blur', () => {
         if (!user_name && localStorage.getItem("zagra_user_nickname")) {
             user_name = localStorage.getItem("zagra_user_nickname");
@@ -97,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
                     
-                    // Agar bazada ismi boru, telefonda o'chib ketgan bo'lsa, bazadagidan tiklaydi
+                    // Agar bazada ismi boru telefonda o'chib ketgan bo'lsa tiklaydi
                     if (data[0].name && !localStorage.getItem("zagra_user_nickname")) {
                         user_name = data[0].name;
                         localStorage.setItem("zagra_user_nickname", user_name);
@@ -109,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function saveUserData() {
-        if (!user_name || user_name.trim() === "") return; // Bo'sh ism bilan bazaga yozishni qat'iy taqiqlaymiz!
+        if (!user_name || user_name.trim() === "") return; // Bo'sh ism bilan bazaga yozish qat'iyan taqiqlanadi!
         fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
             headers: headers,
@@ -125,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timerEl.innerText = elapsed.toFixed(3);
     }
 
+    // O'YIN START / STOP TUGMASI
     if (actionBtn) {
         actionBtn.addEventListener('click', () => {
             if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
@@ -172,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // TABLARNI BOSHQARISH (GAME / RANK)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
@@ -190,36 +222,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (subPerfects && subScores) {
         subPerfects.addEventListener('click', () => { subPerfects.classList.add('active'); subScores.classList.remove('active'); loadLiveLeaderboard('perfects'); });
-        subScores.addEventListener('click', () => { subScores.classList.add('active'); subPerfects.classList.remove('active'); loadLiveLeaderboard('scores'); });
-    }
-
-    function loadLiveLeaderboard(type) {
-        const listEl = document.getElementById('leaderboard');
-        if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live data...</li>';
-
-        let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
-        
-        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, {
-            method: 'GET',
-            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            listEl.innerHTML = '';
-            if (!data || data.length === 0) { listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>'; return; }
-
-            data.forEach((p, i) => {
-                let li = document.createElement('li'); li.className = 'leaderboard-item';
-                let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
-                let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
-                const closeLoginBtn = document.getElementById('close-login-btn');
-if (closeLoginBtn) {
-    closeLoginBtn.addEventListener('click', () => {
-        if (user_name) { // Faqat keshda ismi borlar yopa oladi
-            if (loginScreen) loginScreen.style.display = "none";
-        }
-    });
-}
-
-                
