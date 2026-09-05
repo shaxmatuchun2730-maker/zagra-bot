@@ -213,4 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 let li = document.createElement('li'); li.className = 'leaderboard-item';
                 let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
                 let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
+                const closeLoginBtn = document.getElementById('close-login-btn');
+if (closeLoginBtn) {
+    closeLoginBtn.addEventListener('click', () => {
+        if (user_name) { // Faqat keshda ismi borlar yopa oladi
+            if (loginScreen) loginScreen.style.display = "none";
+        }
+    });
+}
+
                 
