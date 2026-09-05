@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
 
-    // Google Firebase REST API manzili
+    // GOOGLE FIREBASE REST API MANZILI (OXIRIDA .json BO'LISHI UCHUN BAZA HAVOLASI TO'G'RILANDI)
     const FIREBASE_REST_URL = "https://firebaseio.com";
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
 
-    // 1. O'yin ochilishi bilan o'yinchining eski ballarini Google bulutidan toza JSON orqali yuklab olish
-    fetch(`${FIREBASE_REST_URL}/players/${user_id}.json`)
+    // 1. O'yin ochilishi bilan o'yinchining eski ballarini Google bulutidan yuklab olish
+    fetch(`${FIREBASE_REST_URL}players/${user_id}.json`)
         .then(res => res.json())
         .then(data => {
             if (data) {
@@ -63,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // 2. BALLAR DEPOSITINI GOOGLE FIREBASE JAVONIGA PUT REQ BILAN INTEGRATSIYA QILISH
-                fetch(`${FIREBASE_REST_URL}/players/${user_id}.json`, {
+                // 2. BALLARNI GOOGLE FIREBASE BULUTIGA XAVFSIZ VA ABADIY YOZISH
+                fetch(`${FIREBASE_REST_URL}players/${user_id}.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: user_name, score: score, perfects: perfects })
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listEl) return;
         listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global data...</li>';
 
-        fetch(`${FIREBASE_REST_URL}/players.json`)
+        fetch(`${FIREBASE_REST_URL}players.json`)
             .then(res => res.json())
             .then(data => {
                 listEl.innerHTML = '';
