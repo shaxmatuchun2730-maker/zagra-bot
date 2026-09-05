@@ -2,29 +2,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) tg.expand();
 
-    // Telegram foydalanuvchi ma'lumotlari (Xavfsiz zaxira bilan)
-    let user_id = tg?.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random() * 1000);
+    let user_id = String(tg?.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random() * 1000));
     let user_name = tg?.initDataUnsafe?.user?.first_name || tg?.initDataUnsafe?.user?.username || "Cyber_Pilot";
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
 
-    // GOOGLE FIREBASE REST API MANZILI (OXIRIDA .json BO'LISHI UCHUN BAZA HAVOLASI TO'G'RILANDI)
-    const FIREBASE_REST_URL = "https://firebaseio.com";
+    // TEPADA SUPABASE SETTINGS'DAN OLGAN MA'LUMOTLARINGIZNI SHU YERGA QO'YING!
+    const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
+
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates" // Agar foydalanuvchi bor bo'lsa ma'lumotni yangilaydi (Upsert)
+    };
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
 
-    // 1. O'yin ochilishi bilan o'yinchining eski ballarini Google bulutidan yuklab olish
-    fetch(`${FIREBASE_REST_URL}players/${user_id}.json`)
+    // 1. O'yin ochilishi bilan foydalanuvchi ma'lumotlarini PostgreSQL bazasidan yuklab olish
+    fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
         .then(res => res.json())
         .then(data => {
-            if (data) {
-                score = data.score || 0;
-                perfects = data.perfects || 0;
+            if (data && data.length > 0) {
+                score = data[0].score || 0;
+                perfects = data[0].perfects || 0;
                 if (scoreVal) scoreVal.innerText = score;
                 if (perfectVal) perfectVal.innerText = perfects;
             }
-        }).catch(err => console.log("Cloud sync error:", err));
+        }).catch(err => console.log("Database sync skipped"));
 
     function updateTimer() {
         let elapsed = (performance.now() - startTime) / 1000;
@@ -63,17 +70,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // 2. BALLARNI GOOGLE FIREBASE BULUTIGA XAVFSIZ VA ABADIY YOZISH
-                fetch(`${FIREBASE_REST_URL}players/${user_id}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: user_name, score: score, perfects: perfects })
+                // 2. BALLARNI POSTGRESQL BAZASIGA METALLDEK MUSTAHKAM YOZISH (UPSERT REQ)
+                fetch(`${SUPABASE_URL}/rest/v1/players`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
                 });
             }
         });
     }
 
-    // 3. JONLI REYTINGNI SARALASH (2 XIL REYTING)
+    // 3. JONLI REYTING JADVALINI SQL DARAJASIDA TORTISH (2 XIL REYTING)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
@@ -98,41 +105,33 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global data...</li>';
+        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global database...</li>';
 
-        fetch(`${FIREBASE_REST_URL}players.json`)
-            .then(res => res.json())
-            .then(data => {
-                listEl.innerHTML = '';
-                if (!data) { listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>'; return; }
+        // SQL tartibida eng yuqori ballilarni bir qatorda saralab tortish (?order=)
+        let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
+        
+        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, {
+            method: 'GET',
+            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            listEl.innerHTML = '';
+            if (!data || data.length === 0) { listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>'; return; }
 
-                let playersArray = Object.keys(data).map(key => ({
-                    id: key,
-                    name: data[key].name || "Anonymous Pilot",
-                    score: data[key].score || 0,
-                    perfects: data[key].perfects || 0
-                }));
-
-                // 2 xil saralash algoritmi
-                if (type === 'perfects') {
-                    playersArray.sort((a, b) => b.perfects - a.perfects);
-                } else {
-                    playersArray.sort((a, b) => b.score - a.score);
-                }
-
-                playersArray.forEach((p, i) => {
-                    let li = document.createElement('li'); li.className = 'leaderboard-item';
-                    let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
-                    let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
-                    
-                    li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
-                    listEl.appendChild(li);
-                });
-
-                let myRankPosition = playersArray.findIndex(p => p.id == user_id) + 1;
-                document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition || playersArray.length}`;
-            }).catch(err => {
-                listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#ff007f;">Connection timeout! Try again.</li>';
+            data.forEach((p, i) => {
+                let li = document.createElement('li'); li.className = 'leaderboard-item';
+                let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
+                let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
+                
+                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
+                listEl.appendChild(li);
             });
+
+            let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
+            document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
+        }).catch(err => {
+            listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#ff007f;">Connection Error. Reset cache.</li>';
+        });
     }
 });
