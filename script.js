@@ -7,9 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // Kesh xatoliklarini yo'qotish va ismlar aralashib ketmasligi uchun dinamik xotira tizimi
-    let user_id = localStorage.getItem("zagra_user_id") || "pilot_" + Math.floor(performance.now() + Math.random() * 100000);
-    localStorage.setItem("zagra_user_id", user_id);
+    // Unikal foydalanuvchi ID raqamini aniqlash
+    let user_id = localStorage.getItem("zagra_user_id");
+    if (!user_id || user_id.includes("guest")) {
+        user_id = "zagra_" + Math.floor(Math.random() * 10000000);
+        localStorage.setItem("zagra_user_id", user_id);
+    }
 
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
@@ -19,15 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation"
+        "Content-Type": "application/json"
     };
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
 
-    // ISMNI QAT'IY TEKSHIRISH: Agar ism Cyber_Pilot bo'lsa yoki bo'sh bo'lsa loginni ochamiz!
     if (!user_name || user_name === "Cyber_Pilot") {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
@@ -42,13 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Nickname must be at least 2 characters!");
                 return;
             }
-            // Eski 'guest' va 'Cyber_Pilot' xotirasini ildizi bilan tozalaymiz
             user_name = inputVal;
-            user_id = "zagra_" + inputVal.toLowerCase().replace(/[^a-z0-8]/g, "") + "_" + Math.floor(Math.random() * 1000);
-            
-            localStorage.setItem("zagra_user_id", user_id);
             localStorage.setItem("zagra_user_nickname", user_name);
-            
             if (loginScreen) loginScreen.style.display = "none";
             
             saveUserData();
@@ -56,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadUserData() {
-        fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
+        fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
@@ -65,12 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
                 }
-            }).catch(err => console.log("Fetch error:", err));
+            }).catch(err => console.log("Load error"));
     }
 
     function saveUserData() {
         if (!user_name) return;
-        fetch(`${SUPABASE_URL}/rest/v1/players?on_conflict=id`, {
+        // PostgREST standarti bo'yicha toza UPSERT so'rovi (CORS bloksiz)
+        fetch(`${SUPABASE_URL}/rest/v1/players`, {
             method: 'POST',
             headers: {
                 "apikey": SUPABASE_KEY,
@@ -81,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
         })
         .then(() => loadUserData())
-        .catch(err => console.log("Save error:", err));
+        .catch(err => console.log("Save error"));
     }
 
     function updateTimer() {
