@@ -2,12 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) tg.expand();
 
+    // Telegram Inline Game seansidan o'yinchining haqiqiy ismi va unikal ID raqamini aniqlash
     let user_id = String(tg?.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random() * 1000));
-    let user_name = tg?.initDataUnsafe?.user?.first_name || tg?.initDataUnsafe?.user?.username || "Cyber_Pilot";
+    
+    // Haqiqiy ism va familiyani birlashtirib olish algoritmi
+    let first = tg?.initDataUnsafe?.user?.first_name || "";
+    let last = tg?.initDataUnsafe?.user?.last_name || "";
+    let user_name = (first + " " + last).trim() || tg?.initDataUnsafe?.user?.username || "Cyber_Pilot";
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
 
-    // TEPADA SUPABASE SETTINGS'DAN OLGAN MA'LUMOTLARINGIZNI SHU YERGA QO'YING!
     const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co";
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
@@ -15,13 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates" // Agar foydalanuvchi bor bo'lsa ma'lumotni yangilaydi (Upsert)
+        "Prefer": "resolution=merge-duplicates"
     };
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
 
-    // 1. O'yin ochilishi bilan foydalanuvchi ma'lumotlarini PostgreSQL bazasidan yuklab olish
+    // 1. O'yin ochilishi bilan ushbu o'yinchining aniq ballarini bazadan yuklab olish
     fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
         .then(res => res.json())
         .then(data => {
@@ -70,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // 2. BALLARNI POSTGRESQL BAZASIGA METALLDEK MUSTAHKAM YOZISH (UPSERT REQ)
+                // 2. HAQIQIY TELEGRAM ISMI BILAN POSTGRESQL BAZASIGA YOZISH
                 fetch(`${SUPABASE_URL}/rest/v1/players`, {
                     method: 'POST',
                     headers: headers,
@@ -80,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. JONLI REYTING JADVALINI SQL DARAJASIDA TORTISH (2 XIL REYTING)
+    // 3. JONLI REYTING PANEL HISOBLASHI
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
@@ -107,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listEl) return;
         listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global database...</li>';
 
-        // SQL tartibida eng yuqori ballilarni bir qatorda saralab tortish (?order=)
         let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
         
         fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, {
