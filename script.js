@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNTLAR ARALASHIB VA KUYIB KETMASLIGI UCHUN MUSTAHKAM UNIKAL ID TIZIMI
-    let user_id = localStorage.getItem("zagra_user_id");
-    if (!user_id || user_id.includes("guest") || user_id.includes("pilot")) {
-        // Haqiqiy Telegram ID bo'lsa o'shani oladi, bo'lmasa umrbod o'zgarmaydigan tasodifiy kalit muhrlaydi
-        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_pilot_" + Math.floor(Math.random() * 10000000);
-        localStorage.setItem("zagra_user_id", user_id);
+    // AKKAUNTNING DOIMIYLIK KAFOLATI: Agar keshda ID bo'lsa, o'shani qat'iy ushlab qoladi!
+    let user_id = localStorage.getItem("zagra_final_user_id");
+    if (!user_id) {
+        // Agar Telegram haqiqiy ID bersa o'shani oladi, bo'lmasa unikal kiber-ID muhrlaydi
+        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
+        localStorage.setItem("zagra_final_user_id", user_id);
     }
 
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
     const currentNameDisplay = document.getElementById('current-name-display'), editProfileTrigger = document.getElementById('edit-profile-trigger');
 
-    if (!user_name || user_name === "Cyber_Pilot") {
+    // Ism mavjudligini qat'iy tekshirish
+    if (!user_name) {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
         if (loginScreen) loginScreen.style.display = "none";
@@ -82,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    score = data[0].score || 0; // SQL massividan aniq qiymatni yuklash
+                    score = data[0].score || 0; // Massivning birinchi elementidan toza qiymatni o'qish
                     perfects = data[0].perfects || 0;
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
@@ -92,16 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
-        // RPC funksiyamiz orqali yagona ID asosida ma'lumotni yangilash
         fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ p_id: user_id, p_name: user_name, p_score: score, p_perfects: perfects })
         })
-        .then(() => {
-            // Ma'lumot saqlangach reyting yangilanishi uchun bazadan qayta o'qiymiz
-            loadUserData();
-        })
+        .then(() => loadUserData())
         .catch(err => console.log("Save error"));
     }
 
@@ -127,23 +124,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 let finalTime = parseFloat(timerEl.innerText);
                 let addedScore = 0;
+                let triggeredAd = false;
 
                 if (finalTime === 1.000) {
                     perfects += 1; addedScore = 10;
                     if (perfectVal) perfectVal.innerText = perfects;
                     feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "#00f0ff";
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                    showAdBanner();
+                    triggeredAd = true;
+                } else if (finalTime >= 0.995 && finalTime <= 1.005) {
+                    addedScore = 1;
+                    feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
+                    triggeredAd = true;
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
                     feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
                 } else {
                     feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "#ff007f";
                 }
+                
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
                 saveUserData();
+
+                if (triggeredAd) {
+                    showAdBanner();
+                }
             }
         });
     }
@@ -161,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
             tabRank.classList.add('active'); tabGame.classList.remove('active');
             if (gameView) gameView.style.display = 'none'; if (rankView) rankView.style.display = 'flex';
             loadLiveLeaderboard('perfects');
-            showAdBanner();
         });
     }
 
