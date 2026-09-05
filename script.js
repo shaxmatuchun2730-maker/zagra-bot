@@ -1,22 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.expand();
-        tg.ready(); // Telegram WebApp-ni rasman tayyor holatga keltirish
+    if (tg) tg.expand();
+
+    // Akkauntlar aralashib ketmasligi uchun Telegram unikal ID raqamini aniqlash
+    // Agar Telegram ID bermasa, har bir akkaunt brauzeri uchun unikal tasodifiy kalit yaratiladi
+    let user_id = localStorage.getItem("zagra_user_id");
+    if (!user_id) {
+        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "pilot_" + Math.floor(Math.random() * 1000000);
+        localStorage.setItem("zagra_user_id", user_id);
     }
 
-    // TELEGRAM WEBAPP LOGIN API: Har qanday xavfsizlik cheklovlarisiz haqiqiy ism va IDni tortish
-    let initDataUser = tg?.initDataUnsafe?.user;
-    let user_id = String(initDataUser?.id || "guest_" + Math.floor(Math.random() * 1000));
-    
-    let first = initDataUser?.first_name || "";
-    let last = initDataUser?.last_name || "";
-    let user_name = (first + " " + last).trim() || initDataUser?.username || "Cyber_Pilot";
-
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
+    let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
-    // Sizning 100% ishlaydigan rasmiy Supabase bulutli serveringiz
-    const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co";
+    const SUPABASE_URL = "https://supabase.co";
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
     const headers = {
@@ -28,18 +25,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
+    const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
 
-    // 1. O'yin ochilishi bilan ushbu o'yinchining aniq eski ballarini PostgreSQL bazasidan yuklab olish
-    fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                score = data[0].score || 0;
-                perfects = data[0].perfects || 0;
-                if (scoreVal) scoreVal.innerText = score;
-                if (perfectVal) perfectVal.innerText = perfects;
+    // ISMNI TEKSHIRISH: Agar foydalanuvchi oldin ism yozgan bo'lsa, login oynasini ko'rsatmaymiz!
+    if (user_name) {
+        if (loginScreen) loginScreen.style.display = "none";
+        loadUserData();
+    }
+
+    if (startGameBtn) {
+        startGameBtn.addEventListener('click', () => {
+            let inputVal = nicknameInput.value.trim();
+            if (inputVal.length < 2) {
+                alert("Nickname must be at least 2 characters!");
+                return;
             }
-        }).catch(err => console.log("Database sync skipped"));
+            user_name = inputVal;
+            localStorage.setItem("zagra_user_nickname", user_name);
+            if (loginScreen) loginScreen.style.display = "none";
+            loadUserData();
+        });
+    }
+
+    // Ma'lumotlarni bazadan tortib olish funksiyasi
+    function loadUserData() {
+        fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    score = data[0].score || 0;
+                    perfects = data[0].perfects || 0;
+                    if (scoreVal) scoreVal.innerText = score;
+                    if (perfectVal) perfectVal.innerText = perfects;
+                }
+            }).catch(err => console.log("Database fetch error"));
+    }
 
     function updateTimer() {
         let elapsed = (performance.now() - startTime) / 1000;
@@ -78,17 +98,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // 2. MA'LUMOTLARNI SUPABASE POSTGRESQL BAZASIGA ABADIY MUHRLASH (UPSERT REQ)
+                // FOYDALANUVCHI YOZGAN ISM BILAN ABADIY POSTGRESQL BAZASIGA MUHRLASH
                 fetch(`${SUPABASE_URL}/rest/v1/players`, {
                     method: 'POST',
-                    headers: headers,
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "resolution=merge-duplicates"
+                    },
                     body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
                 });
             }
         });
     }
 
-    // 3. JONLI REYTING JADVALI (2 XIL REYTING)
+    // JONLI REYTING JADVALI (2 XIL REYTING)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
