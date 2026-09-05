@@ -7,10 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNTNING DOIMIYLIK KAFOLATI: Agar keshda ID bo'lsa, o'shani qat'iy ushlab qoladi!
+    // AKKAUNTNING DOIMIYLIK KAFOLATI
     let user_id = localStorage.getItem("zagra_final_user_id");
     if (!user_id) {
-        // Agar Telegram haqiqiy ID bersa o'shani oladi, bo'lmasa unikal kiber-ID muhrlaydi
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
         localStorage.setItem("zagra_final_user_id", user_id);
     }
@@ -37,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
     const currentNameDisplay = document.getElementById('current-name-display'), editProfileTrigger = document.getElementById('edit-profile-trigger');
 
-    // Ism mavjudligini qat'iy tekshirish
+    // Ism mavjudligini qat'iy tekshirish va oynani boshqarish
     if (!user_name) {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
@@ -70,6 +69,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // XAVFSIZLIK: Agar login ekranda tasodifan "X" yoki yopish bosilsa, eski ismni tiklaydi
+    window.addEventListener('blur', () => {
+        if (!user_name && localStorage.getItem("zagra_user_nickname")) {
+            user_name = localStorage.getItem("zagra_user_nickname");
+            if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+            if (loginScreen) loginScreen.style.display = "none";
+        }
+    });
+
     function showAdBanner() {
         if (AdController) {
             AdController.show()
@@ -79,20 +87,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadUserData() {
+        if (!user_id) return;
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    score = data[0].score || 0; // Massivning birinchi elementidan toza qiymatni o'qish
+                    score = data[0].score || 0; 
                     perfects = data[0].perfects || 0;
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
+                    
+                    // Agar bazada ismi boru, telefonda o'chib ketgan bo'lsa, bazadagidan tiklaydi
+                    if (data[0].name && !localStorage.getItem("zagra_user_nickname")) {
+                        user_name = data[0].name;
+                        localStorage.setItem("zagra_user_nickname", user_name);
+                        if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+                        if (loginScreen) loginScreen.style.display = "none";
+                    }
                 }
             }).catch(err => console.log("Load error"));
     }
 
     function saveUserData() {
-        if (!user_name) return;
+        if (!user_name || user_name.trim() === "") return; // Bo'sh ism bilan bazaga yozishni qat'iy taqiqlaymiz!
         fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
             headers: headers,
@@ -197,14 +214,3 @@ document.addEventListener("DOMContentLoaded", () => {
                 let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
                 let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
                 
-                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
-                listEl.appendChild(li);
-            });
-
-            let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
-            document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
-        }).catch(err => {
-            listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
-        });
-    }
-});
