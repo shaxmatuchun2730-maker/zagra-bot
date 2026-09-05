@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // Unikal foydalanuvchi ID raqamini aniqlash
+    // Har bir akkaunt uchun unikal ID kalit
     let user_id = localStorage.getItem("zagra_user_id");
     if (!user_id || user_id.includes("guest")) {
         user_id = "zagra_" + Math.floor(Math.random() * 10000000);
@@ -66,16 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
-        // PostgREST standarti bo'yicha toza UPSERT so'rovi (CORS bloksiz)
-        fetch(`${SUPABASE_URL}/rest/v1/players`, {
+        // Supabase RPC (Stored Function) tizimi orqali ma'lumotni xavfsiz va bloksiz yozish!
+        fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${SUPABASE_KEY}`,
-                "Content-Type": "application/json",
-                "Prefer": "resolution=merge-duplicates"
-            },
-            body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
+            headers: headers,
+            body: JSON.stringify({ p_id: user_id, p_name: user_name, p_score: score, p_perfects: perfects })
         })
         .then(() => loadUserData())
         .catch(err => console.log("Save error"));
