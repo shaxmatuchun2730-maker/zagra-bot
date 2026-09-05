@@ -3,49 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zagra Timer | Telegram Edition</title>
-    <!-- Telegram WebApp Core Script -->
+    <title>Zagra Games | Premium Timer Pro</title>
+    <!-- Telegram WebApp Rasmiy Scripti -->
     <script src="https://telegram.org"></script>
     <style>
         :root {
-            --bg-color: #060709;
+            --bg-color: #050608;
             --neon-cyan: #00f0ff;
             --neon-pink: #ff007f;
-            --neon-blue: #0072ff;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-color: #e0e6ed;
+            --neon-purple: #9d00ff;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --text-color: #e2e8f0;
         }
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0; padding: 0;
+        }
+
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(at 10% 20%, rgba(0, 240, 255, 0.05) 0px, transparent 50%), radial-gradient(at 90% 80%, rgba(255, 0, 127, 0.05) 0px, transparent 50%);
-            color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100vh; overflow: hidden; padding: 24px;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.06) 0px, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(255, 0, 127, 0.06) 0px, transparent 40%);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            height: 100vh; overflow: hidden; padding: 24px;
         }
-        .header-stats { width: 100%; display: flex; justify-content: space-between; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+
+        /* Premium Top Stats Panel */
+        .header-stats {
+            width: 100%; display: flex; justify-content: space-between;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 18px 24px; border-radius: 24px; border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
         .stat-box { text-align: center; }
-        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8a99ad; margin-bottom: 4px; }
-        .stat-value { font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
-        .timer-container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; width: 100%; max-width: 340px; }
-        .glass-board { width: 100%; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; padding: 40px 20px; text-align: center; box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02), 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(0, 240, 255, 0.03); margin-bottom: 40px; }
-        #timer { font-size: 64px; font-weight: 800; color: #fff; font-family: 'Courier New', Courier, monospace; text-shadow: 0 0 25px rgba(0, 240, 255, 0.6); letter-spacing: -1px; margin-bottom: 16px; }
-        #feedback { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: #6d7f96; height: 20px; }
-        .stop-btn { width: 100%; max-width: 280px; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(90deg, #ff007f, #7f00ff); color: #fff; font-size: 18px; font-weight: 700; letter-spacing: 3px; cursor: pointer; box-shadow: 0 0 24px rgba(255, 0, 127, 0.4); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 24px; }
-        .stop-btn:active { transform: scale(0.97); }
+        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #718096; margin-bottom: 4px; }
+        .stat-value { font-size: 22px; font-weight: 800; color: #fff; text-shadow: 0 0 12px rgba(0, 240, 255, 0.6); }
+
+        /* Markaziy Haqiqiy Kiber-Shishali Doska */
+        .timer-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex-grow: 1; width: 100%; max-width: 350px;
+        }
+
+        .glass-board {
+            width: 100%; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 40px; padding: 50px 24px; text-align: center;
+            box-shadow: 
+                inset 0 0 30px rgba(255, 255, 255, 0.02),
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 240, 255, 0.04);
+            margin-bottom: 40px; position: relative;
+        }
+
+        /* Neon Frame Effect */
+        .glass-board::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 40px; padding: 1px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), transparent 40%, transparent 60%, rgba(255, 0, 127, 0.25));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude;
+        }
+
+        #timer {
+            font-size: 68px; font-weight: 900; color: #fff; font-family: monospace;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.7); letter-spacing: -1px; margin-bottom: 20px;
+        }
+
+        #feedback { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: #4a5568; height: 20px; }
+
+        /* Premium Tactile 3D STOP Button */
+        .stop-btn {
+            width: 100%; max-width: 290px; padding: 20px; border-radius: 20px; border: none;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            color: #fff; font-size: 20px; font-weight: 800; letter-spacing: 4px; cursor: pointer; outline: none;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.45); transition: all 0.2s ease; text-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-bottom: 30px;
+        }
+
+        .stop-btn:active { transform: scale(0.96); box-shadow: 0 0 15px rgba(255, 0, 127, 0.2); opacity: 0.9; }
+
+        /* Bottom Navigation Tabs */
+        .nav-tabs {
+            display: flex; width: 100%; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(12px);
+            border-radius: 100px; padding: 6px; border: 1px solid var(--glass-border);
+        }
+
+        .tab-btn {
+            flex: 1; padding: 16px; border: none; background: transparent; color: #718096;
+            font-weight: 700; font-size: 14px; letter-spacing: 1px; cursor: pointer; border-radius: 100px; transition: all 0.3s ease;
+        }
+
+        .tab-btn.active { background: #fff; color: #000; box-shadow: 0 10px 20px rgba(255,255,255,0.15); }
+
+        /* Dynamic Dual-Leaderboard Panel */
+        .view-panel {
+            width: 100%; height: 60vh; display: none; flex-direction: column;
+            background: rgba(5, 6, 8, 0.98); backdrop-filter: blur(25px);
+            border-radius: 32px; border: 1px solid var(--glass-border); padding: 24px; margin-bottom: 30px;
+        }
+
+        .view-panel.active { display: flex; }
+        .sub-tabs { display: flex; margin-bottom: 24px; gap: 12px; background: rgba(255,255,255,0.01); padding: 5px; border-radius: 14px; border: 1px solid var(--glass-border); }
+        .sub-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #718096; font-size: 13px; font-weight: 700; border-radius: 10px; cursor: pointer; }
+        .sub-btn.active { background: rgba(255, 255, 255, 0.04); color: #fff; }
+
+        .leaderboard-list { flex-grow: 1; overflow-y: auto; list-style: none; }
+        .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-size: 15px; }
+        .leaderboard-item span.rank { color: var(--neon-cyan); font-weight: 800; width: 35px; }
+        .my-absolute-rank { padding: 16px; text-align: center; background: rgba(0, 240, 255, 0.04); border: 1px solid rgba(0, 240, 255, 0.08); font-weight: 800; font-size: 14px; color: var(--neon-cyan); margin-top: 16px; border-radius: 16px; }
     </style>
 </head>
 <body>
 
-    <div style="width: 100%; display: flex; flex-direction: column; height: 100%;">
+    <!-- GAME VIEW -->
+    <div id="game-view" style="width: 100%; display: flex; flex-direction: column; height: 100%;">
         <div class="header-stats">
-            <div class="stat-box"><div class="stat-label">💎 SCORE</div><div id="score-val" class="stat-value">0</div></div>
-            <div class="stat-box"><div class="stat-label">🎯 1.000 HITS</div><div id="perfect-val" class="stat-value">0</div></div>
+            <div class="stat-box"><div class="stat-label">💎 TOTAL SCORES</div><div id="score-val" class="stat-value">0</div></div>
+            <div class="stat-box"><div class="stat-label">🎯 1.000 KINGS</div><div id="perfect-val" class="stat-value">0</div></div>
         </div>
+
         <div class="timer-container">
-            <div class="glass-board"><div id="timer">0.000</div><div id="feedback">PRESS START</div></div>
+            <div class="glass-board">
+                <div id="timer">0.000</div>
+                <div id="feedback">READY TO HIT</div>
+            </div>
             <button id="action-btn" class="stop-btn">START</button>
         </div>
+    </div>
+
+    <!-- LEADERBOARD VIEW -->
+    <div id="rank-view" class="view-panel">
+        <div class="sub-tabs">
+            <button id="sub-perfects" class="sub-btn active">🎯 1.000 Kings</button>
+            <button id="sub-scores" class="sub-btn">💎 Total Scores</button>
+        </div>
+        <ul id="leaderboard" class="leaderboard-list"></ul>
+        <div id="my-rank" class="my-absolute-rank">Your Rank: Loading...</div>
+    </div>
+
+    <!-- MAIN NAV TABS -->
+    <div class="nav-tabs">
+        <button id="tab-game" class="tab-btn active">🎮 GAME</button>
+        <button id="tab-rank" class="tab-btn">🏆 RANKING</button>
     </div>
 
     <script>
@@ -53,7 +157,10 @@
         tg.expand();
 
         let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
-
+        let user_id = tg.initDataUnsafe?.user?.id || 0;
+        let user_name = tg.initDataUnsafe?.user?.first_name || "Unknown Player";
+        
+        // Telegram o'yin tizimidagi ichki smart xotiradan (Cloud API) real vaqtda ballarni tortish va saqlash
         const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
         const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
 
@@ -64,17 +171,19 @@
         }
 
         actionBtn.addEventListener('click', () => {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); // Premium Vibratsiya
 
             if (!isRunning) {
                 isRunning = true; actionBtn.innerText = "STOP";
                 actionBtn.style.background = "linear-gradient(90deg, #00f0ff, #0072ff)";
+                actionBtn.style.boxShadow = "0 0 30px rgba(0, 240, 255, 0.5)";
                 feedbackEl.innerText = "FOCUS NOW..."; startTime = performance.now();
                 timerInterval = setInterval(updateTimer, 1);
             } else {
                 isRunning = false; clearInterval(timerInterval);
                 actionBtn.innerText = "START";
                 actionBtn.style.background = "linear-gradient(90deg, #ff007f, #7f00ff)";
+                actionBtn.style.boxShadow = "0 0 30px rgba(255, 0, 127, 0.45)";
                 
                 let finalTime = parseFloat(timerEl.innerText);
                 let addedScore = 0;
@@ -84,20 +193,3 @@
                     perfectVal.innerText = perfects;
                     feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "var(--neon-cyan)";
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                } else if (finalTime >= 0.990 && finalTime <= 1.010) {
-                    addedScore = 1;
-                    feedbackEl.innerText = "🔥 SO CLOSE! +1"; feedbackEl.style.color = "#0072ff";
-                } else {
-                    feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "var(--neon-pink)";
-                }
-                score += addedScore; scoreVal.innerText = score;
-
-                // Ballarni daxshatli oson va bepul yo'l bilan Telegramning o'ziga yuborish
-                if (addedScore > 0) {
-                    tg.sendData(JSON.stringify({ score: score, perfects: perfects }));
-                }
-            }
-        });
-    </script>
-</body>
-</html>
