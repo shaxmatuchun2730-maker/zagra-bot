@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
-    const SUPABASE_URL = "https://supabase.co"; 
+    const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
     const headers = {
