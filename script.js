@@ -14,16 +14,22 @@ function updateTimer() {
 }
 
 actionBtn.addEventListener('click', () => {
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); // Jismoniy tebranish
+    // Tebranish effekti
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
     if (!isRunning) {
-        isRunning = true; actionBtn.innerText = "STOP";
+        // TAYMERNI ISHGA TUSHIRISH
+        isRunning = true; 
+        actionBtn.innerText = "STOP";
         actionBtn.style.background = "linear-gradient(90deg, #00f0ff, #0072ff)";
         actionBtn.style.boxShadow = "0 0 30px rgba(0, 240, 255, 0.5)";
-        feedbackEl.innerText = "FOCUS NOW..."; startTime = performance.now();
+        feedbackEl.innerText = "FOCUS NOW..."; 
+        startTime = performance.now();
         timerInterval = setInterval(updateTimer, 1);
     } else {
-        isRunning = false; clearInterval(timerInterval);
+        // TAYMERNI TO'XTATISH
+        isRunning = false; 
+        clearInterval(timerInterval);
         actionBtn.innerText = "START";
         actionBtn.style.background = "linear-gradient(90deg, #ff007f, #7f00ff)";
         actionBtn.style.boxShadow = "0 0 30px rgba(255, 0, 127, 0.45)";
@@ -34,24 +40,32 @@ actionBtn.addEventListener('click', () => {
         if (finalTime === 1.000) {
             perfects++; addedScore = 10;
             perfectVal.innerText = perfects;
-            feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "var(--neon-cyan)";
+            feedbackEl.innerText = "🎯 PERFECT HIT! +10"; 
+            feedbackEl.style.color = "var(--neon-cyan)";
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } else if (finalTime >= 0.990 && finalTime <= 1.010) {
             addedScore = 1;
-            feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
+            feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; 
+            feedbackEl.style.color = "#0072ff";
         } else {
-            feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "var(--neon-pink)";
+            feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; 
+            feedbackEl.style.color = "var(--neon-pink)";
         }
-        score += addedScore; scoreVal.innerText = score;
+        score += addedScore; 
+        scoreVal.innerText = score;
 
-        // Ballarni Telegram bulut tizimiga yuborish
-        if (addedScore > 0) {
-            tg.sendData(JSON.stringify({ score: score, perfects: perfects }));
+        // Xatolik bermasligi uchun xavfsiz Telegram ma'lumot almashinuvi
+        try {
+            if (tg.initDataUnsafe?.query_id) {
+                tg.sendData(JSON.stringify({ score: score, perfects: perfects }));
+            }
+        } catch(e) {
+            console.log("Telegram data sync skipped");
         }
     }
 });
 
-// Navigatsiya Paneli Boshqaruvi
+// Navigatsiya Boshqaruvi
 document.getElementById('tab-game').addEventListener('click', () => toggleTab('game'));
 document.getElementById('tab-rank').addEventListener('click', () => { toggleTab('rank'); loadMockLeaderboard('perfects'); });
 document.getElementById('sub-perfects').addEventListener('click', () => { document.getElementById('sub-perfects').classList.add('active'); document.getElementById('sub-scores').classList.remove('active'); loadMockLeaderboard('perfects'); });
