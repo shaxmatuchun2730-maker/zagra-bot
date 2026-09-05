@@ -25,14 +25,16 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json"
     };
 
-    const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
+        const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
+    const currentNameDisplay = document.getElementById('current-name-display'), editProfileTrigger = document.getElementById('edit-profile-trigger');
 
     if (!user_name || user_name === "Cyber_Pilot") {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
         if (loginScreen) loginScreen.style.display = "none";
+        if (currentNameDisplay) currentNameDisplay.innerText = user_name;
         loadUserData();
     }
 
@@ -45,10 +47,27 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             user_name = inputVal;
             localStorage.setItem("zagra_user_nickname", user_name);
+            if (currentNameDisplay) currentNameDisplay.innerText = user_name;
             if (loginScreen) loginScreen.style.display = "none";
             
+            showAdBanner();
             saveUserData();
         });
+    }
+
+    if (editProfileTrigger) {
+        editProfileTrigger.addEventListener('click', () => {
+            if (nicknameInput) nicknameInput.value = user_name;
+            if (loginScreen) loginScreen.style.display = "flex";
+        });
+    }
+
+    function showAdBanner() {
+        if (AdController) {
+            AdController.show()
+                .then((result) => { console.log("Ad success"); })
+                .catch((result) => { console.log("Ad skipped"); });
+        }
     }
 
     function loadUserData() {
@@ -56,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    score = data[0].score || 0;
-                    perfects = data[0].perfects || 0;
+                    score = data.score || 0;
+                    perfects = data.perfects || 0;
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
                 }
@@ -66,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
-        // Supabase RPC (Stored Function) tizimi orqali ma'lumotni xavfsiz va bloksiz yozish!
         fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
             headers: headers,
@@ -104,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (perfectVal) perfectVal.innerText = perfects;
                     feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "#00f0ff";
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    showAdBanner();
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
                     feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
@@ -131,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tabRank.classList.add('active'); tabGame.classList.remove('active');
             if (gameView) gameView.style.display = 'none'; if (rankView) rankView.style.display = 'flex';
             loadLiveLeaderboard('perfects');
+            showAdBanner();
         });
     }
 
@@ -142,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live global data...</li>';
+        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live data...</li>';
 
         let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
         
