@@ -5,30 +5,29 @@ document.addEventListener("DOMContentLoaded", () => {
         tg.ready();
     }
 
-    let user_id = localStorage.getItem("zagra_user_id");
-    if (!user_id || user_id.includes("guest_")) {
-        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "pilot_" + Math.floor(Math.random() * 1000000);
-        localStorage.setItem("zagra_user_id", user_id);
-    }
-
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
+    
+    // Kesh xatoliklarini yo'qotish va ismlar aralashib ketmasligi uchun dinamik xotira tizimi
+    let user_id = localStorage.getItem("zagra_user_id") || "pilot_" + Math.floor(performance.now() + Math.random() * 100000);
+    localStorage.setItem("zagra_user_id", user_id);
+
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
     const SUPABASE_URL = "https://supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
-    // SUPABASE JADVALIGA UPSERT QILISH UCHUN ENG MUKAMMAL REQ HEADERS
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "return=representation" // Ma'lumot yozilgandan keyin javob qaytarish buyrug'i
+        "Prefer": "return=representation"
     };
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
 
+    // ISMNI QAT'IY TEKSHIRISH: Agar ism Cyber_Pilot bo'lsa yoki bo'sh bo'lsa loginni ochamiz!
     if (!user_name || user_name === "Cyber_Pilot") {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
@@ -43,8 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Nickname must be at least 2 characters!");
                 return;
             }
+            // Eski 'guest' va 'Cyber_Pilot' xotirasini ildizi bilan tozalaymiz
             user_name = inputVal;
+            user_id = "zagra_" + inputVal.toLowerCase().replace(/[^a-z0-8]/g, "") + "_" + Math.floor(Math.random() * 1000);
+            
+            localStorage.setItem("zagra_user_id", user_id);
             localStorage.setItem("zagra_user_nickname", user_name);
+            
             if (loginScreen) loginScreen.style.display = "none";
             
             saveUserData();
@@ -66,14 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
-        // POST request orqali on_conflict parametrini URL ichida xavfsiz jo'natamiz! (Eng toza yo'li)
         fetch(`${SUPABASE_URL}/rest/v1/players?on_conflict=id`, {
             method: 'POST',
             headers: {
                 "apikey": SUPABASE_KEY,
                 "Authorization": `Bearer ${SUPABASE_KEY}`,
                 "Content-Type": "application/json",
-                "Prefer": "resolution=merge-duplicates" // Ziddiyat bo'lsa ustiga yozish
+                "Prefer": "resolution=merge-duplicates"
             },
             body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
         })
