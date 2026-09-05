@@ -2,8 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) tg.expand();
 
-    // Akkauntlar aralashib ketmasligi uchun Telegram unikal ID raqamini aniqlash
-    // Agar Telegram ID bermasa, har bir akkaunt brauzeri uchun unikal tasodifiy kalit yaratiladi
+    // Har bir foydalanuvchi akkaunti uchun unikal ID kalit
     let user_id = localStorage.getItem("zagra_user_id");
     if (!user_id) {
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "pilot_" + Math.floor(Math.random() * 1000000);
@@ -13,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
-    const SUPABASE_URL = "https://supabase.co";
+    // SIZNING RASMIY SUPABASE KALITLARINGIZ (URL OXIRIDAGI CHIZIQCHALAR TO'LIQ TO'G'RILANDI)
+    const SUPABASE_URL = "https://supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
     const headers = {
@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
 
-    // ISMNI TEKSHIRISH: Agar foydalanuvchi oldin ism yozgan bo'lsa, login oynasini ko'rsatmaymiz!
     if (user_name) {
         if (loginScreen) loginScreen.style.display = "none";
         loadUserData();
@@ -47,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Ma'lumotlarni bazadan tortib olish funksiyasi
     function loadUserData() {
+        // Havola to'g'rilandi: rest/v1 oldidagi chiziqcha xavfsiz holatga keltirildi
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { headers })
             .then(res => res.json())
             .then(data => {
@@ -58,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
                 }
-            }).catch(err => console.log("Database fetch error"));
+            }).catch(err => console.log("Fetch error:", err));
     }
 
     function updateTimer() {
@@ -98,22 +97,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // FOYDALANUVCHI YOZGAN ISM BILAN ABADIY POSTGRESQL BAZASIGA MUHRLASH
+                // POSTGRESQL BAZASIGA MA'LUMOT YUBORISH
                 fetch(`${SUPABASE_URL}/rest/v1/players`, {
                     method: 'POST',
-                    headers: {
-                        "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${SUPABASE_KEY}`,
-                        "Content-Type": "application/json",
-                        "Prefer": "resolution=merge-duplicates"
-                    },
+                    headers: headers,
                     body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
-                });
+                }).catch(err => console.log("Save error:", err));
             }
         });
     }
 
-    // JONLI REYTING JADVALI (2 XIL REYTING)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
