@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tg.ready();
     }
 
-    // 1. Akkauntlar uchun unikal ID kalit yaratish (Kesh aralashib ketmasligi uchun)
     let user_id = localStorage.getItem("zagra_user_id");
     if (!user_id || user_id.includes("guest_")) {
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "pilot_" + Math.floor(Math.random() * 1000000);
@@ -13,26 +12,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
-    
-    // Kesh xatoliklarini yo'qotish uchun ismni boshida qat'iy tozalab tekshiramiz
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
 
     const SUPABASE_URL = "https://supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
-    // Supabase PostgreSQL uchun mukammal Upsert (On-Conflict) sarlavhalari
+    // SUPABASE JADVALIGA UPSERT QILISH UCHUN ENG MUKAMMAL REQ HEADERS
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates" // Mavjud bo'lsa yangilash buyrug'i
+        "Prefer": "return=representation" // Ma'lumot yozilgandan keyin javob qaytarish buyrug'i
     };
 
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
 
-    // AGAR FOYDALANUVCHI NICKNAME KIRITMAGAN BO'LSA, LOGIN OYNASINI MAJBURIY KO'RSATAMIZ
     if (!user_name || user_name === "Cyber_Pilot") {
         if (loginScreen) loginScreen.style.display = "flex";
     } else {
@@ -51,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("zagra_user_nickname", user_name);
             if (loginScreen) loginScreen.style.display = "none";
             
-            // Ism kiritilishi bilan bazaga birinchi marta xavfsiz yozib qo'yamiz
             saveUserData();
-            loadUserData();
         });
     }
 
@@ -72,12 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
-        // Supabase-ga PUT request orqali foydalanuvchi ID raqamiga qarab aniq ustiga yozish (Upsert)
-        fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, {
-            method: 'PUT', // PUT metodi id=eq parametrida ma'lumotni xavfsiz yangilaydi
-            headers: headers,
+        // POST request orqali on_conflict parametrini URL ichida xavfsiz jo'natamiz! (Eng toza yo'li)
+        fetch(`${SUPABASE_URL}/rest/v1/players?on_conflict=id`, {
+            method: 'POST',
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                "Prefer": "resolution=merge-duplicates" // Ziddiyat bo'lsa ustiga yozish
+            },
             body: JSON.stringify({ id: user_id, name: user_name, score: score, perfects: perfects })
-        }).catch(err => console.log("Save error:", err));
+        })
+        .then(() => loadUserData())
+        .catch(err => console.log("Save error:", err));
     }
 
     function updateTimer() {
@@ -117,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += addedScore; 
                 if (scoreVal) scoreVal.innerText = score;
 
-                // Har safar o'yin to'xtaganda ma'lumotlarni bulutga yuboramiz
                 saveUserData();
             }
         });
