@@ -7,10 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // Har bir akkaunt uchun unikal ID kalit
+    // AKKAUNTLAR ARALASHIB VA KUYIB KETMASLIGI UCHUN MUSTAHKAM UNIKAL ID TIZIMI
     let user_id = localStorage.getItem("zagra_user_id");
-    if (!user_id || user_id.includes("guest")) {
-        user_id = "zagra_" + Math.floor(Math.random() * 10000000);
+    if (!user_id || user_id.includes("guest") || user_id.includes("pilot")) {
+        // Haqiqiy Telegram ID bo'lsa o'shani oladi, bo'lmasa umrbod o'zgarmaydigan tasodifiy kalit muhrlaydi
+        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_pilot_" + Math.floor(Math.random() * 10000000);
         localStorage.setItem("zagra_user_id", user_id);
     }
 
@@ -19,13 +20,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
+    const ADSGRAM_BLOCK_ID = "4829"; 
+    let AdController = null;
+    if (window.Adsgram) {
+        AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+    }
+
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json"
     };
 
-        const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
+    const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn'), scoreVal = document.getElementById('score-val'), perfectVal = document.getElementById('perfect-val');
     const loginScreen = document.getElementById('login-screen'), nicknameInput = document.getElementById('nickname-input'), startGameBtn = document.getElementById('start-game-btn');
     const currentNameDisplay = document.getElementById('current-name-display'), editProfileTrigger = document.getElementById('edit-profile-trigger');
@@ -75,8 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    score = data.score || 0;
-                    perfects = data.perfects || 0;
+                    score = data[0].score || 0; // SQL massividan aniq qiymatni yuklash
+                    perfects = data[0].perfects || 0;
                     if (scoreVal) scoreVal.innerText = score;
                     if (perfectVal) perfectVal.innerText = perfects;
                 }
@@ -85,12 +92,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function saveUserData() {
         if (!user_name) return;
+        // RPC funksiyamiz orqali yagona ID asosida ma'lumotni yangilash
         fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ p_id: user_id, p_name: user_name, p_score: score, p_perfects: perfects })
         })
-        .then(() => loadUserData())
+        .then(() => {
+            // Ma'lumot saqlangach reyting yangilanishi uchun bazadan qayta o'qiymiz
+            loadUserData();
+        })
         .catch(err => console.log("Save error"));
     }
 
@@ -118,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 let addedScore = 0;
 
                 if (finalTime === 1.000) {
-                    perfects++; addedScore = 10;
+                    perfects += 1; addedScore = 10;
                     if (perfectVal) perfectVal.innerText = perfects;
                     feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "#00f0ff";
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
@@ -187,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
             document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
         }).catch(err => {
-            listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#ff007f;">Connection Error.</li>';
+            listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
         });
     }
 });
