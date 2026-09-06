@@ -7,14 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNTNING DOIMIYLIK KAFOLATI: Telegram ID yoki unikal muhr keshlanadi
+    // AKKAUNT DOIMIYLIGI: Telegram ID yoki unikal doimiy kiber-kalit
     let user_id = localStorage.getItem("zagra_final_user_id");
     if (!user_id) {
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
         localStorage.setItem("zagra_final_user_id", user_id);
     }
 
-    // TELEGRAMDAN ISMNI AVTOMATIK OLISH (Agar keshda hali yo'q bo'lsa)
+    // TELEGRAM ISM ATOMATIK YUKLASH
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
     if (!user_name) {
         user_name = tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
@@ -30,10 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json"
     };
 
-    // Elementlarni brauzerdan bog'lab olish
+    // DOM Elementlari bilan bog'lanish
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn');
-    const menuScoreVal = document.getElementById('menu-score-val'), menuPerfectVal = document.getElementById('menu-perfect-val');
+    const headerScoreVal = document.getElementById('header-score-val'), headerPerfectVal = document.getElementById('header-perfect-val');
     const currentNameDisplay = document.getElementById('current-name-display');
     
     const profileModal = document.getElementById('profile-modal');
@@ -41,63 +41,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const editProfileTrigger = document.getElementById('edit-profile-trigger');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const saveNicknameBtn = document.getElementById('save-nickname-btn');
-    const enterArenaBtn = document.getElementById('enter-arena-btn');
 
-    const tabMenu = document.getElementById('tab-menu');
     const tabGame = document.getElementById('tab-game');
     const tabRank = document.getElementById('tab-rank');
-
-    const menuView = document.getElementById('menu-view');
     const gameView = document.getElementById('game-view');
     const rankView = document.getElementById('rank-view');
 
     const subPerfects = document.getElementById('sub-perfects');
     const subScores = document.getElementById('sub-scores');
 
-    // O'yin ochilganda ismni ekranga chiqarish va bazadan ballarni yuklash
+    // Boshlang'ich qiymat o'rnatish
     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
     loadUserData();
 
-    // ENTER ARENA TUGMASI INTEGRATSIYASI (100% ISHCHY)
-    if (enterArenaBtn) {
-        enterArenaBtn.addEventListener('click', () => {
-            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
-            switchView('game');
+    // PASTKI ASOSIY NAVIGATSIYA (GAME / RANKING)
+    if (tabGame) {
+        tabGame.addEventListener('click', () => {
+            tabGame.classList.add('active'); if (tabRank) tabRank.classList.remove('active');
+            if (gameView) gameView.style.display = 'flex'; if (rankView) rankView.style.display = 'none';
         });
     }
 
-    // MAIN NAVIGATSIYA TABLARI
-    if (tabMenu) tabMenu.addEventListener('click', () => switchView('menu'));
-    if (tabGame) tabGame.addEventListener('click', () => switchView('game'));
-    if (tabRank) tabRank.addEventListener('click', () => switchView('rank'));
-
-    function switchView(viewName) {
-        // Hamma ekranlarni yopish
-        if (menuView) menuView.style.display = 'none';
-        if (gameView) gameView.style.display = 'none';
-        if (rankView) rankView.style.display = 'none';
-
-        // Tablarning aktivlik klasslarini o'chirish
-        if (tabMenu) tabMenu.classList.remove('active');
-        if (tabGame) tabGame.classList.remove('active');
-        if (tabRank) tabRank.classList.remove('active');
-
-        // Kerakli ekranni ochish va tabni aktiv qilish
-        if (viewName === 'menu') {
-            if (menuView) menuView.style.display = 'flex';
-            if (tabMenu) tabMenu.classList.add('active');
-            loadUserData();
-        } else if (viewName === 'game') {
-            if (gameView) gameView.style.display = 'flex';
-            if (tabGame) tabGame.classList.add('active');
-        } else if (viewName === 'rank') {
-            if (rankView) rankView.style.display = 'flex';
-            if (tabRank) tabRank.classList.add('active');
+    if (tabRank) {
+        tabRank.addEventListener('click', () => {
+            tabRank.classList.add('active'); if (tabGame) tabGame.classList.remove('active');
+            if (gameView) gameView.style.display = 'none'; if (rankView) rankView.style.display = 'flex';
             loadLiveLeaderboard('perfects');
-        }
+        });
     }
 
-    // NICKNAME TAHRIRLASH (XAVFSIZ MODAL)
+    // RANKING 2 GA BO'LINGAN QISMI (PERFECT KINGS / TOP SCORES)
+    if (subPerfects && subScores) {
+        subPerfects.addEventListener('click', () => { subPerfects.classList.add('active'); subScores.classList.remove('active'); loadLiveLeaderboard('perfects'); });
+        subScores.addEventListener('click', () => { subScores.classList.add('active'); subPerfects.classList.remove('active'); loadLiveLeaderboard('scores'); });
+    }
+
+    // PROFILE TAHRIRLASH (XAVFSIZ MODAL)
     if (editProfileTrigger) {
         editProfileTrigger.addEventListener('click', () => {
             if (nicknameInput) nicknameInput.value = user_name;
@@ -135,8 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data && data.length > 0) {
                     score = data.score || 0; 
                     perfects = data.perfects || 0;
-                    if (menuScoreVal) menuScoreVal.innerText = score;
-                    if (menuPerfectVal) menuPerfectVal.innerText = perfects;
+                    if (headerScoreVal) headerScoreVal.innerText = score;
+                    if (headerPerfectVal) headerPerfectVal.innerText = perfects;
                 }
             }).catch(err => console.log("Load error"));
     }
@@ -153,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => console.log("Save error"));
     }
 
-    // GAME TIMER MOTORISHTIRILISHI
+    // TIMER HARAKATI
     function updateTimer() {
         let elapsed = (performance.now() - startTime) / 1000;
         if (elapsed >= 1.5) startTime = performance.now();
@@ -198,17 +177,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // LEADERBOARD SWITCH TUGMALARI
-    if (subPerfects && subScores) {
-        subPerfects.addEventListener('click', () => { subPerfects.classList.add('active'); subScores.classList.remove('active'); loadLiveLeaderboard('perfects'); });
-        subScores.addEventListener('click', () => { subScores.classList.add('active'); subPerfects.classList.remove('active'); loadLiveLeaderboard('scores'); });
-    }
-
-    // JONLI REYTINGNI BAZADAN TORTIB KELISH
+    // JONLI REYTINGNI YUKLASH BO'LIMI
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing live data...</li>';
+        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing leaderboard...</li>';
 
         let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
         
@@ -220,3 +193,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.forEach((p, i) => {
                 let li = document.createElement('li'); li.className = 'leaderboard-item';
+                let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
+                let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
+                
+                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
+                listEl.appendChild(li);
+            });
+
+            let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
+            document.getElementById('my-rank').innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
+        }).catch(err => {
+            listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
+        });
+    }
+});
