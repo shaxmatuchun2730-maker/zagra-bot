@@ -2,87 +2,355 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zagra Timer | Premium Cyber Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Zagra Cyber Pilot</title>
+    <!-- Telegram WebApp Script -->
     <script src="https://telegram.org"></script>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
     <style>
-        /* Ism kiritish uchun daxshatli chiroyli shishali oyna */
-        .login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 6, 8, 0.95); backdrop-filter: blur(30px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999; padding: 30px; transition: all 0.5s ease;
+        :root {
+            --bg-color: #0a0f1d;
+            --panel-color: #141b2d;
+            --cyan: #00f0ff;
+            --purple: #7f00ff;
+            --magenta: #ff007f;
+            --text-main: #ffffff;
+            --text-sub: #8fa0b5;
         }
-        .login-box {
-            width: 100%; max-width: 320px; background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; padding: 40px 24px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .login-title { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; margin-bottom: 10px; text-shadow: 0 0 10px var(--neon-cyan); }
-        .login-subtitle { font-size: 12px; color: #718096; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
-        .login-input {
-            width: 100%; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px; color: #fff; font-size: 16px; font-weight: 600; text-align: center; outline: none;
-            margin-bottom: 24px; transition: all 0.3s;
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
-        .login-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
-        .login-btn {
-            width: 100%; padding: 16px; border-radius: 14px; border: none;
-            background: linear-gradient(90deg, #00f0ff, #0072ff); color: #fff;
-            font-size: 16px; font-weight: 800; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 20px rgba(0,240,255,0.3);
+
+        /* Navigatsiya Tablari */
+        .nav-tabs {
+            display: flex;
+            background-color: var(--panel-color);
+            border-bottom: 2px solid #1e293b;
+            z-index: 10;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 0;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            color: var(--cyan);
+            border-bottom: 3px solid var(--cyan);
+            background: linear-gradient(to top, rgba(0, 240, 255, 0.05), transparent);
+        }
+
+        /* Asosiy Kontent Konteyneri */
+        .content-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 1. MAIN MENU STYLE */
+        #menu-view {
+            display: flex; /* Boshida shu ekran ochiq bo'ladi */
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .profile-card {
+            background: var(--panel-color);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #current-name-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .edit-icon-btn {
+            background: none;
+            border: none;
+            color: var(--cyan);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .menu-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            border-top: 1px solid #1e293b;
+            padding-top: 15px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-box span {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .stat-box strong {
+            font-size: 20px;
+            color: var(--cyan);
+        }
+
+        .stat-box strong.perf {
+            color: var(--magenta);
+        }
+
+        /* Neon Enter Arena Tugmasi */
+        .enter-arena-btn {
+            background: linear-gradient(45deg, var(--purple), var(--magenta));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .enter-arena-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 35px var(--cyan);
+        }
+
+        /* 2. GAME VIEW STYLE */
+        .timer-display {
+            font-size: 64px;
+            font-family: monospace;
+            color: var(--text-main);
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+            margin: 40px 0;
+        }
+
+        #feedback {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-sub);
+            height: 25px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .action-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(90deg, var(--magenta), var(--purple));
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        /* 3. RANK VIEW STYLE */
+        .rank-header {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .sub-tabs {
+            display: flex;
+            background: var(--panel-color);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #1e293b;
+        }
+
+        .sub-btn {
+            flex: 1;
+            padding: 8px 0;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .sub-btn.active {
+            background: #1e293b;
+            color: var(--cyan);
+        }
+
+        #my-rank {
+            font-size: 13px;
+            color: var(--cyan);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .leaderboard-list {
+            width: 100%;
+            max-width: 400px;
+            list-style: none;
+            background: var(--panel-color);
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 14px;
+        }
+
+        .leaderboard-item:last-child { border-bottom: none; }
+        .leaderboard-item .rank { color: var(--text-sub); font-weight: bold; width: 35px; }
+
+        /* 4. MODAL DIALOG (EDIT PROFILE) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: var(--panel-color);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 320px;
+            position: relative;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: none; border: none;
+            color: var(--text-sub); font-size: 20px;
+            cursor: pointer;
+        }
+
+        .modal-box h3 { margin-bottom: 15px; font-size: 18px; color: #fff; }
+        
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            background: #0a0f1d;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .modal-box input:focus { border-color: var(--cyan); }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, var(--cyan), #0072ff);
+            color: white; border: none; border-radius: 8px;
+            font-weight: bold; font-size: 15px; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <!-- NICKNAME KIRITISH PANELI -->
-    <div id="login-screen" class="login-overlay">
-        <div class="login-box">
-            <div class="login-title">CYBER IDENTITY</div>
-            <div class="login-subtitle">Enter your pilot nickname</div>
-            <input type="text" id="nickname-input" class="login-input" placeholder="💥 Enter Nickname..." maxlength="15">
-            <button id="start-game-btn" class="login-btn">ENTER ARENA</button>
-        </div>
-    </div>
+    <!-- Yuqori Asosiy Tablar Navigatsiyasi -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" id="tab-menu">MENU</button>
+        <button class="tab-btn" id="tab-game">ARENA</button>
+        <button class="tab-btn" id="tab-rank">LEADERBOARD</button>
+    </nav>
 
-    <!-- ASOSIY O'YIN INPUTI -->
-    <div class="game-wrapper">
-    <!-- SHU 3 TA QATORNI QO'SHING -->
-    <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 10px;">
-        <div id="edit-profile-trigger" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 100px; font-size: 11px; font-weight: 700; color: #718096; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 6px;">👤 PILOT: <span id="current-name-display" style="color:#fff;">...</span> ✏️</div>
-    </div>
+    <!-- Kontent Hududi -->
+    <div class="content-container">
 
-    <header class="header-stats">
-            <div class="stat-box"><span class="stat-label">💎 TOTAL SCORES</span><div id="score-val" class="stat-value">0</div></div>
-            <div class="stat-box"><span class="stat-label">🎯 1.000 KINGS</span><div id="perfect-val" class="stat-value">0</div></div>
-        </header>
-
-        <main class="timer-container">
-            <div id="game-view" class="game-board-layout">
-                <div class="glass-board">
-                    <div id="timer">0.000</div>
-                    <div id="feedback">READY TO HIT</div>
+        <!-- EKRAN 1: BOSH MENYU -->
+        <div class="view-panel" id="menu-view" style="display: flex;">
+            <div class="profile-card">
+                <div class="user-row">
+                    <span id="current-name-display">Loading Pilot...</span>
+                    <button class="edit-icon-btn" id="edit-profile-trigger">✏️</button>
                 </div>
-                <button id="action-btn" class="stop-btn">START</button>
-            </div>
-
-            <section id="rank-view" class="view-panel">
-                <div class="sub-tabs">
-                    <button id="sub-perfects" class="sub-btn active">🎯 1.000 Kings</button>
-                    <button id="sub-scores" class="sub-btn">💎 Total Scores</button>
-                </div>
-                <ul id="leaderboard" class="leaderboard-list"></ul>
-                <div id="my-rank" class="my-absolute-rank">Your Rank: Loading...</div>
-            </section>
-        </main>
-
-        <nav class="nav-tabs">
-            <button id="tab-game" class="tab-btn active">🎮 GAME</button>
-            <button id="tab-rank" class="tab-btn">🏆 RANKING</button>
-        </nav>
-    </div>
-
-</body>
-</html>
+                <div class="menu-stats">
+                    <div class="stat-box">
+                        <span>Total Score</span>
+                        <strong id="menu-score-val">0</strong>
+                    </div>
+                    <div class="stat-box">
