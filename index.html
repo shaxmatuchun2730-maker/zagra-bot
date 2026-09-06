@@ -35,35 +35,46 @@
             height: 100vh;
         }
 
-        /* Navigatsiya Tablari */
-        .nav-tabs {
+        /* Yuqori Profil Qismi */
+        .header-profile {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
             background-color: var(--panel-color);
-            border-bottom: 2px solid #1e293b;
-            z-index: 10;
+            border-bottom: 1px solid #1e293b;
         }
 
-        .tab-btn {
-            flex: 1;
-            padding: 15px 0;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #current-name-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .edit-btn {
             background: none;
             border: none;
-            color: var(--text-sub);
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .tab-btn.active {
             color: var(--cyan);
-            border-bottom: 3px solid var(--cyan);
-            background: linear-gradient(to top, rgba(0, 240, 255, 0.05), transparent);
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        /* Asosiy Kontent Konteyneri */
+        .header-stats {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .header-stats strong {
+            color: var(--cyan);
+        }
+
+        /* Asosiy Kontent Joyi */
         .content-container {
             flex: 1;
             position: relative;
@@ -81,100 +92,12 @@
             height: 100%;
         }
 
-        /* 1. MAIN MENU STYLE */
-        #menu-view {
-            display: flex; /* Boshida shu ekran ochiq bo'ladi */
+        /* GAME VIEW STYLES */
+        #game-view {
+            display: flex; /* Boshida o'yin oynasi ochiq bo'ladi */
             justify-content: center;
-            gap: 40px;
         }
 
-        .profile-card {
-            background: var(--panel-color);
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 340px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .user-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        #current-name-display {
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .edit-icon-btn {
-            background: none;
-            border: none;
-            color: var(--cyan);
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .menu-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-            border-top: 1px solid #1e293b;
-            padding-top: 15px;
-        }
-
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-box span {
-            font-size: 12px;
-            color: var(--text-sub);
-        }
-
-        .stat-box strong {
-            font-size: 20px;
-            color: var(--cyan);
-        }
-
-        .stat-box strong.perf {
-            color: var(--magenta);
-        }
-
-        /* Neon Enter Arena Tugmasi */
-        .enter-arena-btn {
-            background: linear-gradient(45deg, var(--purple), var(--magenta));
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 180px;
-            height: 180px;
-            font-size: 18px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .enter-arena-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 35px var(--cyan);
-        }
-
-        /* 2. GAME VIEW STYLE */
         .timer-display {
             font-size: 64px;
             font-family: monospace;
@@ -188,18 +111,18 @@
             font-weight: bold;
             color: var(--text-sub);
             height: 25px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             letter-spacing: 1px;
         }
 
         .action-btn {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(90deg, var(--magenta), var(--purple));
             color: white;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 900;
             letter-spacing: 2px;
             cursor: pointer;
@@ -207,7 +130,7 @@
             transition: all 0.2s ease;
         }
 
-        /* 3. RANK VIEW STYLE */
+        /* RANK VIEW STYLES */
         .rank-header {
             width: 100%;
             max-width: 400px;
@@ -226,11 +149,11 @@
 
         .sub-btn {
             flex: 1;
-            padding: 8px 0;
+            padding: 10px 0;
             background: none;
             border: none;
             color: var(--text-sub);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             border-radius: 6px;
@@ -255,7 +178,7 @@
             background: var(--panel-color);
             border-radius: 12px;
             border: 1px solid #1e293b;
-            max-height: 60vh;
+            max-height: 55vh;
             overflow-y: auto;
         }
 
@@ -263,7 +186,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #1e293b;
             font-size: 14px;
         }
@@ -271,7 +194,35 @@
         .leaderboard-item:last-child { border-bottom: none; }
         .leaderboard-item .rank { color: var(--text-sub); font-weight: bold; width: 35px; }
 
-        /* 4. MODAL DIALOG (EDIT PROFILE) */
+        /* Pastki Asosiy Navigatsiya */
+        .nav-tabs {
+            display: flex;
+            background-color: var(--panel-color);
+            border-top: 2px solid #1e293b;
+            z-index: 10;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 0;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            color: var(--cyan);
+            border-top: 3px solid var(--cyan);
+            background: linear-gradient(to bottom, rgba(0, 240, 255, 0.05), transparent);
+        }
+
+        /* MODAL OYNA (EDIT NICKNAME) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -318,8 +269,6 @@
             outline: none;
         }
 
-        .modal-box input:focus { border-color: var(--cyan); }
-
         .save-btn {
             width: 100%;
             padding: 12px;
@@ -331,26 +280,61 @@
 </head>
 <body>
 
-    <!-- Yuqori Asosiy Tablar Navigatsiyasi -->
-    <nav class="nav-tabs">
-        <button class="tab-btn active" id="tab-menu">MENU</button>
-        <button class="tab-btn" id="tab-game">ARENA</button>
-        <button class="tab-btn" id="tab-rank">LEADERBOARD</button>
-    </nav>
+    <!-- Yuqori Profil Paneli -->
+    <div class="header-profile">
+        <div class="user-info">
+            <span id="current-name-display">Loading...</span>
+            <button class="edit-btn" id="edit-profile-trigger">✏️</button>
+        </div>
+        <div class="header-stats">
+            Score: <strong id="header-score-val">0</strong> | Perfects: <strong id="header-perfect-val">0</strong>
+        </div>
+    </div>
 
-    <!-- Kontent Hududi -->
+    <!-- Markaziy Kontent Hududi -->
     <div class="content-container">
 
-        <!-- EKRAN 1: BOSH MENYU -->
-        <div class="view-panel" id="menu-view" style="display: flex;">
-            <div class="profile-card">
-                <div class="user-row">
-                    <span id="current-name-display">Loading Pilot...</span>
-                    <button class="edit-icon-btn" id="edit-profile-trigger">✏️</button>
+        <!-- O'YIN MAYDONI (GAME VIEW) -->
+        <div class="view-panel" id="game-view" style="display: flex;">
+            <div class="timer-display" id="timer">0.000</div>
+            <div id="feedback">READY PILOT?</div>
+            <button class="action-btn" id="action-btn">START</button>
+        </div>
+
+        <!-- REYTING HUDUDI (RANK VIEW) -->
+        <div class="view-panel" id="rank-view">
+            <div class="rank-header">
+                <!-- Reyting 2 bo'lingan qismi -->
+                <div class="sub-tabs">
+                    <button class="sub-btn active" id="sub-perfects">PERFECT KINGS</button>
+                    <button class="sub-btn" id="sub-scores">TOP SCORES</button>
                 </div>
-                <div class="menu-stats">
-                    <div class="stat-box">
-                        <span>Total Score</span>
-                        <strong id="menu-score-val">0</strong>
-                    </div>
-                    <div class="stat-box">
+                <span id="my-rank">Syncing ranking...</span>
+            </div>
+            <ul class="leaderboard-list" id="leaderboard">
+                <!-- Jonli ma'lumotlar keladi -->
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- OSMA PROFILE MODAL OYNASI -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box">
+            <button class="modal-close" id="modal-close-btn">✕</button>
+            <h3>Edit Callsign</h3>
+            <input type="text" id="nickname-input" placeholder="Callsign..." maxlength="15">
+            <button class="save-btn" id="save-nickname-btn">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <!-- Pastki Asosiy Navigatsiya Tablari -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" id="tab-game">GAME</button>
+        <button class="tab-btn" id="tab-rank">RANKING</button>
+    </nav>
+
+    <!-- Motor JS script -->
+    <script src="script.js"></script>
+</body>
+</html>
