@@ -84,9 +84,11 @@
             height: 100%;
         }
 
-        /* GAME VIEW STYLES */
+        /* GAME VIEW STYLES - CHALIG'ITUVCHI BOSHQA STYLLAR TOZALANDI */
         #game-view {
-            display: flex; /* Boshida o'yin oynasi ochiq bo'ladi */
+            display: flex; 
+            flex-direction: column; /* MUTLOQ USTUN SHAKLIDA TEPA-PAST JOYLASHTIRISH */
+            align-items: center;
             justify-content: flex-start;
         }
 
@@ -136,7 +138,7 @@
             font-family: monospace;
             color: var(--text-main);
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin: 45px 0;
+            margin: 40px 0;
             flex-shrink: 0;
         }
 
@@ -347,4 +349,3 @@
         <div class="view-panel" id="rank-view">
             <div class="rank-header">
                 <div class="sub-tabs">
-                    <button class="sub-btn active" id="sub-perfects">PERFECT KINGS</button>
