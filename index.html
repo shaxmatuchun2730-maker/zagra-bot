@@ -115,9 +115,12 @@
             letter-spacing: 1px;
         }
 
-                .action-btn {
-            width: 220px;
-            height: 220px;
+                      .action-btn {
+            width: 190px;
+            height: 190px;
+            min-width: 190px;
+            min-height: 190px;
+            flex-shrink: 0;
             border-radius: 50%;
             border: none;
             background: linear-gradient(90deg, var(--magenta), var(--purple));
@@ -130,7 +133,9 @@
             transition: all 0.2s ease;
             outline: none; 
             -webkit-tap-highlight-color: transparent;
+            margin-top: 10px;
         }
+
 
         /* RANK VIEW STYLES */
         .rank-header {
