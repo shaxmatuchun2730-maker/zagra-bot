@@ -14,8 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("zagra_final_user_id", user_id);
     }
 
-    let user_name = "";
+    // ISMNI KAFOLATLI OLISH: Motor qulflanishining oldi olindi
+    let user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem("zagra_user_nickname", user_name);
 
+    // SIZ TAQDIM ETGAN TO'G'RI SUPABASE HAVOLASI
     const SUPABASE_URL = "https://jgonmawxpwsypvjqtqlt.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_10jQxY495GgfBJ-_n2UlJw_ujlhx1Tv";
 
@@ -48,32 +51,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const subPerfects = document.getElementById('sub-perfects');
     const subScores = document.getElementById('sub-scores');
 
-    // BIRINCHI MARTA DATA YUKLASH
+    // BOSHIDANOQ ISMNI EKRANGA CHIQARISH VA DATANI YUKLASH
+    if (currentNameDisplay) currentNameDisplay.innerText = user_name;
     loadUserData();
 
-    // PASTKI ASOSIY NAVIGATSIYA
+    // PASTKI ASOSIY NAVIGATSIYA (GAME / RANKING)
     if (tabGame) {
         tabGame.addEventListener('click', () => {
-            tabGame.classList.add('active'); if (tabRank) tabRank.classList.remove('active');
-            if (gameView) gameView.style.display = 'flex'; if (rankView) rankView.style.display = 'none';
+            tabGame.classList.add('active'); 
+            if (tabRank) tabRank.classList.remove('active');
+            if (gameView) gameView.style.display = 'flex'; 
+            if (rankView) rankView.style.display = 'none';
         });
     }
 
     if (tabRank) {
         tabRank.addEventListener('click', () => {
-            tabRank.classList.add('active'); if (tabGame) tabGame.classList.remove('active');
-            if (gameView) gameView.style.display = 'none'; if (rankView) rankView.style.display = 'flex';
+            tabRank.classList.add('active'); 
+            if (tabGame) tabGame.classList.remove('active');
+            if (gameView) gameView.style.display = 'none'; 
+            if (rankView) rankView.style.display = 'flex';
             loadLiveLeaderboard('perfects');
         });
     }
 
-    // JONLI REYTING SARALASH TUGMALARI
+    // REYTING ICHKI FILTRLARI (PERFECT KINGS / TOP SCORES)
     if (subPerfects && subScores) {
-        subPerfects.addEventListener('click', () => { subPerfects.classList.add('active'); subScores.classList.remove('active'); loadLiveLeaderboard('perfects'); });
-        subScores.addEventListener('click', () => { subScores.classList.add('active'); subPerfects.classList.remove('active'); loadLiveLeaderboard('scores'); });
+        subPerfects.addEventListener('click', () => { 
+            subPerfects.classList.add('active'); 
+            subScores.classList.remove('active'); 
+            loadLiveLeaderboard('perfects'); 
+        });
+        subScores.addEventListener('click', () => { 
+            subScores.classList.add('active'); 
+            subPerfects.classList.remove('active'); 
+            loadLiveLeaderboard('scores'); 
+        });
     }
 
-    // PROFILE TAHRIRLASH MODALI (✏️)
+    // PROFILE TAHRIRLASH MODAL TUGMALARI (✏️)
     if (editProfileTrigger) {
         editProfileTrigger.addEventListener('click', () => {
             if (nicknameInput) nicknameInput.value = user_name;
@@ -102,16 +118,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // BAZADAN MA'LUMOTLARNI VA ENG YANGI ISMNI YUKLASH FUNKSIYASI
+    // BAZADAN MA'LUMOTLARNI VA ENG YANGI ISMNI YUKLASH FUNKSIYASI (MASSIV TO'G'RI TOZALANDI)
     function loadUserData() {
         if (!user_id) return;
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const pilotData = data[0]; // Massivning birinchi elementidan toza qiymatni o'qish
+                    const pilotData = data[0]; // [0] orqali massivning birinchi elementini aniq o'qiymiz!
                     
-                    user_name = pilotData.name || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_";
+                    user_name = pilotData.name || tg?.initDataUnsafe?.user?.first_name || user_name;
                     localStorage.setItem("zagra_user_nickname", user_name);
                     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
 
@@ -120,10 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     if (headerScoreVal) headerScoreVal.innerText = score;
                     if (headerPerfectVal) headerPerfectVal.innerText = perfects;
-                } else {
-                    user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
-                    localStorage.setItem("zagra_user_nickname", user_name);
-                    if (currentNameDisplay) currentNameDisplay.innerText = user_name;
                 }
             }).catch(err => console.log("Load error"));
     }
@@ -140,14 +152,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => console.log("Save error"));
     }
 
-    // TIMER HARAKATI
+    // TIMER HARAKATI MATEMATIKASI
     function updateTimer() {
         let elapsed = (performance.now() - startTime) / 1000;
         if (elapsed >= 1.5) startTime = performance.now();
-        timerEl.innerText = elapsed.toFixed(3);
+        if (timerEl) timerEl.innerText = elapsed.toFixed(3);
     }
 
-    // START / STOP TUGMASI MEXANIZMI
+    // START / STOP TUGMASI MEXANIZMI VA ADOLATLI "+2 PT" BAL TIZIMI
     if (actionBtn) {
         actionBtn.addEventListener('click', () => {
             if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
@@ -156,7 +168,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 isRunning = true; 
                 actionBtn.innerText = "STOP";
                 actionBtn.style.background = "linear-gradient(90deg, #00f0ff, #0072ff)";
-                feedbackEl.innerText = "FOCUS NOW..."; 
+                if (feedbackEl) {
+                    feedbackEl.innerText = "FOCUS NOW..."; 
+                    feedbackEl.style.color = "var(--text-sub)";
+                }
                 startTime = performance.now();
                 timerInterval = setInterval(updateTimer, 1);
             } else {
@@ -165,26 +180,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 actionBtn.innerText = "START";
                 actionBtn.style.background = "linear-gradient(90deg, #ff007f, #7f00ff)";
                 
-                let finalTime = parseFloat(timerEl.innerText);
+                let finalTime = timerEl ? parseFloat(timerEl.innerText) : 0;
                 let addedScore = 0;
 
                 if (finalTime === 1.000) {
                     perfects += 1; 
                     addedScore = 10;
-                    feedbackEl.innerText = "🎯 PERFECT HIT! +10"; 
-                    feedbackEl.style.color = "#00f0ff";
+                    if (feedbackEl) {
+                        feedbackEl.innerText = "🎯 PERFECT HIT! +10"; 
+                        feedbackEl.style.color = "#00f0ff";
+                    }
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (finalTime >= 0.995 && finalTime <= 1.005) {
-                    addedScore = 1;
-                    feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; 
-                    feedbackEl.style.color = "#0072ff";
+                    addedScore = 2; // SIZ AYTGANDEK ENDI HIGH ACCURACY UCHUN +2 PT!
+                    if (feedbackEl) {
+                        feedbackEl.innerText = "🔥 EXCELLENT! +2 PT"; 
+                        feedbackEl.style.color = "#00f0ff";
+                    }
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
-                    feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; 
-                    feedbackEl.style.color = "#0072ff";
+                    if (feedbackEl) {
+                        feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; 
+                        feedbackEl.style.color = "#0072ff";
+                    }
                 } else {
-                    feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; 
-                    feedbackEl.style.color = "#ff007f";
+                    if (feedbackEl) {
+                        feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; 
+                        feedbackEl.style.color = "#ff007f";
+                    }
                 }
                 
                 score += addedScore; 
@@ -197,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // JONLI REYTING JADVALI
+    // JONLI REYTING JADVALINI TORTISH
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
@@ -209,14 +232,3 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             listEl.innerHTML = '';
-            if (!data || data.length === 0) { listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>'; return; }
-
-            data.forEach((p, i) => {
-                let li = document.createElement('li'); li.className = 'leaderboard-item';
-                let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
-                let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
-                
-                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
-                listEl.appendChild(li);
-            });
-
