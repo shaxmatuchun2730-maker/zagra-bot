@@ -35,7 +35,7 @@
             height: 100vh;
         }
 
-        /* Yuqori Profil Qismi */
+        /* Yuqori Profil Paneli */
         .header-profile {
             display: flex;
             align-items: center;
@@ -85,11 +85,12 @@
 
         /* GAME VIEW STYLES */
         #game-view {
-            display: flex; /* Boshida o'yin oynasi ochiq bo'ladi */
-            justify-content: center;
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
         }
 
-        /* Soniya tepasidagi ixcham stats paneli */
+        /* Soniya tepasidagi 2 ga bo'lingan ixcham stats paneli */
         .game-stats-row {
             display: flex;
             width: 100%;
@@ -98,8 +99,8 @@
             border: 1px solid #1e293b;
             border-radius: 12px;
             padding: 10px 0;
-            margin-bottom: 10px;
             margin-top: 10px;
+            flex-shrink: 0;
         }
         
         .game-stat-item {
@@ -134,7 +135,8 @@
             font-family: monospace;
             color: var(--text-main);
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin: 40px 0;
+            margin: 25px 0;
+            flex-shrink: 0;
         }
 
         #feedback {
@@ -142,11 +144,12 @@
             font-weight: bold;
             color: var(--text-sub);
             height: 25px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             letter-spacing: 1px;
+            flex-shrink: 0;
         }
 
-        /* MUTLOQ DUMALOQ VA SOYASIZ START TUGMASI */
+        /* MUTLOQ DUMALOQ VA KO'K SOYASIZ START TUGMASI */
         .action-btn {
             width: 190px;
             height: 190px;
@@ -165,7 +168,6 @@
             transition: all 0.2s ease;
             outline: none; 
             -webkit-tap-highlight-color: transparent;
-            margin-top: 10px;
         }
 
         /* RANK VIEW STYLES */
@@ -232,12 +234,13 @@
         .leaderboard-item:last-child { border-bottom: none; }
         .leaderboard-item .rank { color: var(--text-sub); font-weight: bold; width: 35px; }
 
-        /* Pastki Asosiy Navigatsiya */
+        /* Pastki Asosiy Navigatsiya Tablari */
         .nav-tabs {
             display: flex;
             background-color: var(--panel-color);
             border-top: 2px solid #1e293b;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .tab-btn {
@@ -260,7 +263,7 @@
             background: linear-gradient(to bottom, rgba(0, 240, 255, 0.05), transparent);
         }
 
-        /* MODAL OYNA (EDIT NICKNAME) */
+        /* MODAL OYNA (EDIT PROFILE) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -329,7 +332,7 @@
     <!-- Markaziy Kontent Hududi -->
     <div class="content-container">
 
-                  <!-- O'YIN MAYDONI (GAME VIEW) -->
+        <!-- O'YIN MAYDONI (GAME VIEW) -->
         <div class="view-panel" id="game-view" style="display: flex;">
             
             <!-- Soniya (0.000) dan tepada turuvchi ixcham va chiroyli 2 talik panel -->
