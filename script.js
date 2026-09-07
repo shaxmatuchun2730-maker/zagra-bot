@@ -101,17 +101,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // BAZADAN MA'LUMOTLARNI YUKLASH
+       // BAZADAN MA'LUMOTLARNI VA ENG YANGI ISMNI YUKLASH
     function loadUserData() {
         if (!user_id) return;
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    score = data.score || 0; 
-                    perfects = data.perfects || 0;
+                    // Qurilma xotirasidan emas, to'g'ridan-to'g'ri bazadagi haqiqiy ismni olamiz!
+                    user_name = data[0].name || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_";
+                    localStorage.setItem("zagra_user_nickname", user_name);
+                    if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+
+                    score = data[0].score || 0; 
+                    perfects = data[0].perfects || 0;
                     if (headerScoreVal) headerScoreVal.innerText = score;
                     if (headerPerfectVal) headerPerfectVal.innerText = perfects;
+                } else {
+                    // Agar o'yinchi bazada umuman yo'q bo'lsa (yangi o'yinchi bo'lsa)
+                    user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
+                    localStorage.setItem("zagra_user_nickname", user_name);
+                    if (currentNameDisplay) currentNameDisplay.innerText = user_name;
                 }
             }).catch(err => console.log("Load error"));
     }
