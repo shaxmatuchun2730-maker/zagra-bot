@@ -179,7 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "#ff007f";
                 }
                 
-                score += addedScore; 
+                                score += addedScore; 
+                if (headerScoreVal) headerScoreVal.innerText = score;
+                if (headerPerfectVal) headerPerfectVal.innerText = perfects;
                 saveUserData();
             }
         });
