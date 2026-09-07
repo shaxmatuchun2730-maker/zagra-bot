@@ -108,3 +108,36 @@ body {
 .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-size: 15px; }
 .leaderboard-item span.rank { color: var(--neon-cyan); font-weight: 800; width: 35px; }
 .my-absolute-rank { padding: 16px; text-align: center; background: rgba(0, 240, 255, 0.04); border: 1px solid rgba(0, 240, 255, 0.08); font-weight: 800; font-size: 14px; color: var(--neon-cyan); margin-top: 16px; border-radius: 16px; }
+        .game-stats-row {
+            display: flex;
+            width: 100%;
+            max-width: 320px;
+            background: var(--panel-color);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        .game-stat-item {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-stat-item:first-child {
+            border-right: 1px solid #1e293b;
+        }
+        .game-stat-item span {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .game-stat-item strong {
+            font-size: 18px;
+            color: var(--cyan);
+        }
+        .game-stat-item strong.perf {
+            color: var(--magenta);
+        }
