@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DOM Elementlari bilan bog'lanish
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn');
-    const headerScoreVal = document.getElementById('header-score-val'), headerPerfectVal = document.getElementById('header-perfect-val');
+    const headerScoreVal = document.getElementById('game-score-val'), headerPerfectVal = document.getElementById('game-perfect-val');
     const currentNameDisplay = document.getElementById('current-name-display');
     
     const profileModal = document.getElementById('profile-modal');
