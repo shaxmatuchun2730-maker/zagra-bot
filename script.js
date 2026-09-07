@@ -7,12 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNT DOIMIYLIGI: Telegram ID yoki unikal doimiy kiber-kalit
-    let user_id = localStorage.getItem("zagra_final_user_id");
-    if (!user_id) {
-        user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
-        localStorage.setItem("zagra_final_user_id", user_id);
-    }
+       // Ism o'zgaruvchisini yaratamiz, u birinchi bo'lib bazadan, topilmasa Telegramdan olinadi
+    let user_name = "";
 
     // TELEGRAM ISM ATOMATIK YUKLASH
     let user_name = localStorage.getItem("zagra_user_nickname") || "";
