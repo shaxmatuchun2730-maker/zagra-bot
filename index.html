@@ -65,16 +65,7 @@
             cursor: pointer;
         }
 
-        .header-stats {
-            font-size: 14px;
-            color: var(--text-sub);
-        }
-
-        .header-stats strong {
-            color: var(--cyan);
-        }
-
-        /* Asosiy Kontent Joyi */
+        /* Markaziy Kontent Joyi */
         .content-container {
             flex: 1;
             position: relative;
@@ -98,6 +89,46 @@
             justify-content: center;
         }
 
+        /* Soniya tepasidagi ixcham stats paneli */
+        .game-stats-row {
+            display: flex;
+            width: 100%;
+            max-width: 320px;
+            background: var(--panel-color);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        
+        .game-stat-item {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .game-stat-item:first-child {
+            border-right: 1px solid #1e293b;
+        }
+        
+        .game-stat-item span {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .game-stat-item strong {
+            font-size: 18px;
+            color: var(--cyan);
+        }
+        
+        .game-stat-item strong.perf {
+            color: var(--magenta);
+        }
+
         .timer-display {
             font-size: 64px;
             font-family: monospace;
@@ -115,7 +146,8 @@
             letter-spacing: 1px;
         }
 
-                      .action-btn {
+        /* MUTLOQ DUMALOQ VA SOYASIZ START TUGMASI */
+        .action-btn {
             width: 190px;
             height: 190px;
             min-width: 190px;
@@ -135,7 +167,6 @@
             -webkit-tap-highlight-color: transparent;
             margin-top: 10px;
         }
-
 
         /* RANK VIEW STYLES */
         .rank-header {
@@ -283,40 +314,6 @@
             color: white; border: none; border-radius: 8px;
             font-weight: bold; font-size: 15px; cursor: pointer;
         }
-                .game-stats-row {
-            display: flex;
-            width: 100%;
-            max-width: 320px;
-            background: var(--panel-color);
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 10px 0;
-            margin-bottom: 10px;
-            margin-top: 10px;
-        }
-        .game-stat-item {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-        }
-        .game-stat-item:first-child {
-            border-right: 1px solid #1e293b;
-        }
-        .game-stat-item span {
-            font-size: 11px;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .game-stat-item strong {
-            font-size: 18px;
-            color: var(--cyan);
-        }
-        .game-stat-item strong.perf {
-            color: var(--magenta);
-        }
-
     </style>
 </head>
 <body>
@@ -327,26 +324,25 @@
             <span id="current-name-display">Loading...</span>
             <button class="edit-btn" id="edit-profile-trigger">✏️</button>
         </div>
-        <div class="header-stats">
-            Score: <strong id="header-score-val">0</strong> | Perfects: <strong id="header-perfect-val">0</strong>
-        </div>
     </div>
 
     <!-- Markaziy Kontent Hududi -->
     <div class="content-container">
 
-              <!-- O'YIN MAYDONI (GAME VIEW) -->
+        <!-- O'YIN MAYDONI (GAME VIEW) -->
         <div class="view-panel" id="game-view" style="display: flex;">
             
             <!-- Soniya (0.000) dan tepada turuvchi ixcham va chiroyli 2 talik panel -->
             <div class="game-stats-row">
-                <div class="game-stat-item">
-                    <span>Score</span>
-                    <strong id="game-score-val">0</strong>
-                </div>
-                <div class="game-stat-item">
-                    <span>Perfects</span>
-                    <strong id="game-perfect-val" class="perf">0</strong>
+                <div class="game-stats-row">
+                    <div class="game-stat-item">
+                        <span>Score</span>
+                        <strong id="game-score-val">0</strong>
+                    </div>
+                    <div class="game-stat-item">
+                        <span>Perfects</span>
+                        <strong id="game-perfect-val" class="perf">0</strong>
+                    </div>
                 </div>
             </div>
 
@@ -355,41 +351,4 @@
             <button class="action-btn" id="action-btn">START</button>
         </div>
 
-
         <!-- REYTING HUDUDI (RANK VIEW) -->
-        <div class="view-panel" id="rank-view">
-            <div class="rank-header">
-                <!-- Reyting 2 bo'lingan qismi -->
-                <div class="sub-tabs">
-                    <button class="sub-btn active" id="sub-perfects">PERFECT KINGS</button>
-                    <button class="sub-btn" id="sub-scores">TOP SCORES</button>
-                </div>
-                <span id="my-rank">Syncing ranking...</span>
-            </div>
-            <ul class="leaderboard-list" id="leaderboard">
-                <!-- Jonli ma'lumotlar keladi -->
-            </ul>
-        </div>
-
-    </div>
-
-    <!-- OSMA PROFILE MODAL OYNASI -->
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-box">
-            <button class="modal-close" id="modal-close-btn">✕</button>
-            <h3>Edit Callsign</h3>
-            <input type="text" id="nickname-input" placeholder="Callsign..." maxlength="15">
-            <button class="save-btn" id="save-nickname-btn">SAVE CHANGES</button>
-        </div>
-    </div>
-
-    <!-- Pastki Asosiy Navigatsiya Tablari -->
-    <nav class="nav-tabs">
-        <button class="tab-btn active" id="tab-game">GAME</button>
-        <button class="tab-btn" id="tab-rank">RANKING</button>
-    </nav>
-
-    <!-- Motor JS script -->
-    <script src="script.js"></script>
-</body>
-</html>
