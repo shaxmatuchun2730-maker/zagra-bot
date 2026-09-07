@@ -43,6 +43,7 @@
             padding: 15px 20px;
             background-color: var(--panel-color);
             border-bottom: 1px solid #1e293b;
+            flex-shrink: 0;
         }
 
         .user-info {
@@ -69,7 +70,7 @@
         .content-container {
             flex: 1;
             position: relative;
-            overflow-y: auto;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -85,9 +86,8 @@
 
         /* GAME VIEW STYLES */
         #game-view {
-            display: flex;
+            display: flex; /* Boshida o'yin oynasi ochiq bo'ladi */
             justify-content: flex-start;
-            gap: 15px;
         }
 
         /* Soniya tepasidagi 2 ga bo'lingan ixcham stats paneli */
@@ -98,7 +98,7 @@
             background: var(--panel-color);
             border: 1px solid #1e293b;
             border-radius: 12px;
-            padding: 10px 0;
+            padding: 12px 0;
             margin-top: 10px;
             flex-shrink: 0;
         }
@@ -108,6 +108,7 @@
             text-align: center;
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
         
         .game-stat-item:first-child {
@@ -122,7 +123,7 @@
         }
         
         .game-stat-item strong {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--cyan);
         }
         
@@ -135,17 +136,7 @@
             font-family: monospace;
             color: var(--text-main);
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin: 25px 0;
-            flex-shrink: 0;
-        }
-
-        #feedback {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-sub);
-            height: 25px;
-            margin-bottom: 25px;
-            letter-spacing: 1px;
+            margin: 45px 0;
             flex-shrink: 0;
         }
 
@@ -176,6 +167,7 @@
             max-width: 400px;
             text-align: center;
             margin-bottom: 15px;
+            flex-shrink: 0;
         }
 
         .sub-tabs {
@@ -218,7 +210,7 @@
             background: var(--panel-color);
             border-radius: 12px;
             border: 1px solid #1e293b;
-            max-height: 55vh;
+            flex: 1;
             overflow-y: auto;
         }
 
@@ -348,8 +340,11 @@
             </div>
 
             <div class="timer-display" id="timer">0.000</div>
-            <div id="feedback">READY PILOT?</div>
             <button class="action-btn" id="action-btn">START</button>
         </div>
 
         <!-- REYTING HUDUDI (RANK VIEW) -->
+        <div class="view-panel" id="rank-view">
+            <div class="rank-header">
+                <div class="sub-tabs">
+                    <button class="sub-btn active" id="sub-perfects">PERFECT KINGS</button>
