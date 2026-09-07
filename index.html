@@ -330,12 +330,26 @@
     <!-- Markaziy Kontent Hududi -->
     <div class="content-container">
 
-        <!-- O'YIN MAYDONI (GAME VIEW) -->
+              <!-- O'YIN MAYDONI (GAME VIEW) -->
         <div class="view-panel" id="game-view" style="display: flex;">
+            
+            <!-- Soniya (0.000) dan tepada turuvchi ixcham va chiroyli 2 talik panel -->
+            <div class="game-stats-row">
+                <div class="game-stat-item">
+                    <span>Score</span>
+                    <strong id="game-score-val">0</strong>
+                </div>
+                <div class="game-stat-item">
+                    <span>Perfects</span>
+                    <strong id="game-perfect-val" class="perf">0</strong>
+                </div>
+            </div>
+
             <div class="timer-display" id="timer">0.000</div>
             <div id="feedback">READY PILOT?</div>
             <button class="action-btn" id="action-btn">START</button>
         </div>
+
 
         <!-- REYTING HUDUDI (RANK VIEW) -->
         <div class="view-panel" id="rank-view">
