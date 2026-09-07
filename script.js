@@ -26,12 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json"
     };
 
-    // DOM Elementlari bilan bog'lanish
-    const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
+        // DOM Elementlari brauzer ID-lari bilan zanjirdek mahkam bog'lanadi
+    const timerEl = document.getElementById('timer');
+    const feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn');
-    const headerScoreVal = document.getElementById('game-score-val'), headerPerfectVal = document.getElementById('game-perfect-val');
-    const currentNameDisplay = document.getElementById('current-name-display');
     
+    // Ballar soniya tepasidagi panelga bog'lanishi shart!
+    const headerScoreVal = document.getElementById('game-score-val');
+    const headerPerfectVal = document.getElementById('game-perfect-val');
+    
+    const currentNameDisplay = document.getElementById('current-name-display');
     const profileModal = document.getElementById('profile-modal');
     const nicknameInput = document.getElementById('nickname-input');
     const editProfileTrigger = document.getElementById('edit-profile-trigger');
@@ -45,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const subPerfects = document.getElementById('sub-perfects');
     const subScores = document.getElementById('sub-scores');
+
 
     // Boshlang'ich qiymat o'rnatish
     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
