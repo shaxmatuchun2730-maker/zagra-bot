@@ -35,7 +35,7 @@
             height: 100vh;
         }
 
-        /* Yuqori Profil Paneli */
+        /* Tepadagi original statistika va profil paneli */
         .header-profile {
             display: flex;
             align-items: center;
@@ -43,7 +43,6 @@
             padding: 15px 20px;
             background-color: var(--panel-color);
             border-bottom: 1px solid #1e293b;
-            flex-shrink: 0;
         }
 
         .user-info {
@@ -66,11 +65,19 @@
             cursor: pointer;
         }
 
-        /* Markaziy Kontent Joyi */
+        .header-stats {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .header-stats strong {
+            color: var(--cyan);
+        }
+
         .content-container {
             flex: 1;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
@@ -84,53 +91,9 @@
             height: 100%;
         }
 
-        /* GAME VIEW STYLES - CHALIG'ITUVCHI BOSHQA STYLLAR TOZALANDI */
         #game-view {
-            display: flex; 
-            flex-direction: column; /* MUTLOQ USTUN SHAKLIDA TEPA-PAST JOYLASHTIRISH */
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        /* Soniya tepasidagi 2 ga bo'lingan ixcham stats paneli */
-        .game-stats-row {
             display: flex;
-            width: 100%;
-            max-width: 320px;
-            background: var(--panel-color);
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 12px 0;
-            margin-top: 10px;
-            flex-shrink: 0;
-        }
-        
-        .game-stat-item {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .game-stat-item:first-child {
-            border-right: 1px solid #1e293b;
-        }
-        
-        .game-stat-item span {
-            font-size: 11px;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .game-stat-item strong {
-            font-size: 20px;
-            color: var(--cyan);
-        }
-        
-        .game-stat-item strong.perf {
-            color: var(--magenta);
+            justify-content: center;
         }
 
         .timer-display {
@@ -138,17 +101,22 @@
             font-family: monospace;
             color: var(--text-main);
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin: 40px 0;
-            flex-shrink: 0;
+            margin: 60px 0;
         }
 
-        /* MUTLOQ DUMALOQ VA KO'K SOYASIZ START TUGMASI */
+        #feedback {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-sub);
+            height: 25px;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        /* ORQASIDA KO'K TO'RBURCHAK CHIQMAYDIGAN ORIGINAL DUMALOQ TUGMA */
         .action-btn {
-            width: 190px;
-            height: 190px;
-            min-width: 190px;
-            min-height: 190px;
-            flex-shrink: 0;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(90deg, var(--magenta), var(--purple));
@@ -163,13 +131,11 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* RANK VIEW STYLES */
         .rank-header {
             width: 100%;
             max-width: 400px;
             text-align: center;
             margin-bottom: 15px;
-            flex-shrink: 0;
         }
 
         .sub-tabs {
@@ -212,7 +178,7 @@
             background: var(--panel-color);
             border-radius: 12px;
             border: 1px solid #1e293b;
-            flex: 1;
+            max-height: 55vh;
             overflow-y: auto;
         }
 
@@ -228,13 +194,11 @@
         .leaderboard-item:last-child { border-bottom: none; }
         .leaderboard-item .rank { color: var(--text-sub); font-weight: bold; width: 35px; }
 
-        /* Pastki Asosiy Navigatsiya Tablari */
         .nav-tabs {
             display: flex;
             background-color: var(--panel-color);
             border-top: 2px solid #1e293b;
             z-index: 10;
-            flex-shrink: 0;
         }
 
         .tab-btn {
@@ -257,7 +221,6 @@
             background: linear-gradient(to bottom, rgba(0, 240, 255, 0.05), transparent);
         }
 
-        /* MODAL OYNA (EDIT PROFILE) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -315,37 +278,54 @@
 </head>
 <body>
 
-    <!-- Yuqori Profil Paneli -->
+    <!-- Tepadagi original statistika va profil paneli -->
     <div class="header-profile">
         <div class="user-info">
             <span id="current-name-display">Loading...</span>
             <button class="edit-btn" id="edit-profile-trigger">✏️</button>
         </div>
+        <div class="header-stats">
+            Score: <strong id="header-score-val">0</strong> | Perfects: <strong id="header-perfect-val">0</strong>
+        </div>
     </div>
 
-    <!-- Markaziy Kontent Hududi -->
     <div class="content-container">
-
-        <!-- O'YIN MAYDONI (GAME VIEW) -->
+        <!-- O'YIN MAYDONI -->
         <div class="view-panel" id="game-view" style="display: flex;">
-            
-            <!-- Soniya (0.000) dan tepada turuvchi ixcham va chiroyli 2 talik panel -->
-            <div class="game-stats-row">
-                <div class="game-stat-item">
-                    <span>Score</span>
-                    <strong id="game-score-val">0</strong>
-                </div>
-                <div class="game-stat-item">
-                    <span>Perfects</span>
-                    <strong id="game-perfect-val" class="perf">0</strong>
-                </div>
-            </div>
-
             <div class="timer-display" id="timer">0.000</div>
+            <div id="feedback">FOCUS NOW...</div>
             <button class="action-btn" id="action-btn">START</button>
         </div>
 
-        <!-- REYTING HUDUDI (RANK VIEW) -->
+        <!-- REYTING MAYDONI -->
         <div class="view-panel" id="rank-view">
             <div class="rank-header">
                 <div class="sub-tabs">
+                    <button class="sub-btn active" id="sub-perfects">PERFECT KINGS</button>
+                    <button class="sub-btn" id="sub-scores">TOP SCORES</button>
+                </div>
+                <span id="my-rank">Syncing ranking...</span>
+            </div>
+            <ul class="leaderboard-list" id="leaderboard"></ul>
+        </div>
+    </div>
+
+    <!-- NICKNAME TAHRIRLASH MODALI -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box">
+            <button class="modal-close" id="modal-close-btn">✕</button>
+            <h3>Edit Callsign</h3>
+            <input type="text" id="nickname-input" placeholder="Callsign..." maxlength="15">
+            <button class="save-btn" id="save-nickname-btn">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <!-- ORIGINAL PASTKI NAVIGATSIYA TUGMALARI -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" id="tab-game">GAME</button>
+        <button class="tab-btn" id="tab-rank">RANKING</button>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
