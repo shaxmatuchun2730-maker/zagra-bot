@@ -278,6 +278,40 @@
             color: white; border: none; border-radius: 8px;
             font-weight: bold; font-size: 15px; cursor: pointer;
         }
+                .game-stats-row {
+            display: flex;
+            width: 100%;
+            max-width: 320px;
+            background: var(--panel-color);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        .game-stat-item {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-stat-item:first-child {
+            border-right: 1px solid #1e293b;
+        }
+        .game-stat-item span {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .game-stat-item strong {
+            font-size: 18px;
+            color: var(--cyan);
+        }
+        .game-stat-item strong.perf {
+            color: var(--magenta);
+        }
+
     </style>
 </head>
 <body>
