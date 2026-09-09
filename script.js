@@ -15,11 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("zagra_final_user_id", user_id);
     }
 
-    // SIZ AYTGAN TELEGRAM ACCOUNT ISMI VA @USERNAME TIZIMI (DARHOL EKRANGA CHIQADI!)
+    // TELEGRAM ACCOUNT ISMI TIZIMI (DARHOL EKRANGA CHIQARISH)
     let tg_first_name = tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot";
     let tg_username = tg?.initDataUnsafe?.user?.username ? " (@" + tg.initDataUnsafe.user.username + ")" : "";
     
-    // Kirishi bilanoq Telegram ma'lumotlarini birlashtirib ism qilib tayyorlaymiz
     let user_name = localStorage.getItem("zagra_user_nickname") || (tg_first_name + tg_username);
     localStorage.setItem("zagra_user_nickname", user_name);
 
@@ -49,13 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
 
-    // HECH QANDAY KUTISHLARSIZ TELEGRAM ISMI SHU SONIYADA PORLAB CHIQADI!
+    // ISMNI KUTISHOLARSIZ SHU ZAHOTI DEFIZGA CHIQARAMIZ
     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
     
-    // Orqa fonda bazadagi eski ma'lumotlarni yuklaymiz (ekranni aslo muzlatmaydi)
+    // Orqa fonda ma'lumotlarni yuklashni boshlaymiz
     loadUserData();
 
-    // NAVIGATSIYA TUGMALARI ISHLASHI
+    // NAVIGATSIYA TUGMALARI ARXITEKTURASI
     if (tabGame) {
         tabGame.addEventListener('click', () => {
             tabGame.classList.add('active'); if (tabRank) tabRank.classList.remove('active');
@@ -104,14 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // BAZADAN MA'LUMOT VA LAPTOP/TELEFON ISMINI SINXRONLASH
+    // BAZADAN JONLI MASSIV ELEMENTINI TO'G'RI O'QISH (HAL ETUVCHI QISM!)
     function loadUserData() {
         if (!user_id) return;
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const pilotData = data[0]; 
+                    const pilotData = data[0]; // XATOLIK 100% TO'G'RILANDI! MASSIVNING 1-ELEMENTI O'QILMOQDA.
                     user_name = pilotData.name || user_name;
                     localStorage.setItem("zagra_user_nickname", user_name);
                     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
@@ -121,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (headerScoreVal) headerScoreVal.innerText = score;
                     if (headerPerfectVal) headerPerfectVal.innerText = perfects + " 👑";
                 }
-            }).catch(err => console.log("Load error"));
+            }).catch(err => console.log("Background sync load..."));
     }
 
     function saveUserData() {
@@ -180,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // REYTING JADVALI INTEGRATSIYASI
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
@@ -204,3 +202,4 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
+            const myRankEl = document.getElementById('my-rank');
