@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. TELEGRAM WEBAPP INTEGRATSIYASI
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.expand();
@@ -7,15 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
-    // AKKAUNT DOIMIYLIGI KAFOLATI
+    // 2. FOYDALANUVCHI ID RAQAMI VA KESH KAFOLATI
     let user_id = localStorage.getItem("zagra_final_user_id");
     if (!user_id) {
         user_id = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "zagra_player_" + Math.floor(performance.now() + Math.random() * 10000000);
         localStorage.setItem("zagra_final_user_id", user_id);
     }
 
-    // Qurilma xotirasidan emas, bazadan ismni olish uchun boshida Telegram ismini zaxira qilib qo'yamiz
-    let user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
+    // SIZ AYTGAN TELEGRAM ACCOUNT ISMI VA @USERNAME TIZIMI (DARHOL EKRANGA CHIQADI!)
+    let tg_first_name = tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot";
+    let tg_username = tg?.initDataUnsafe?.user?.username ? " (@" + tg.initDataUnsafe.user.username + ")" : "";
+    
+    // Kirishi bilanoq Telegram ma'lumotlarini birlashtirib ism qilib tayyorlaymiz
+    let user_name = localStorage.getItem("zagra_user_nickname") || (tg_first_name + tg_username);
     localStorage.setItem("zagra_user_nickname", user_name);
 
     // BAZA INTEGRATSIYASI
@@ -28,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json"
     };
 
-    // ORIGINAL ELEMENT INTEGRATSIYASI
+    // HTML ELEMENTLARINI CHAQIRISH
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn');
     const headerScoreVal = document.getElementById('header-score-val'), headerPerfectVal = document.getElementById('header-perfect-val');
@@ -44,7 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
 
+    // HECH QANDAY KUTISHLARSIZ TELEGRAM ISMI SHU SONIYADA PORLAB CHIQADI!
     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+    
+    // Orqa fonda bazadagi eski ma'lumotlarni yuklaymiz (ekranni aslo muzlatmaydi)
     loadUserData();
 
     // NAVIGATSIYA TUGMALARI ISHLASHI
@@ -103,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const pilotData = data[0]; // MASSIVNING 1-ELEMENTINI TO'G'RI O'QIYMIZ!
+                    const pilotData = data[0]; 
                     user_name = pilotData.name || user_name;
                     localStorage.setItem("zagra_user_nickname", user_name);
                     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
@@ -111,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     score = pilotData.score || 0; 
                     perfects = pilotData.perfects || 0;
                     if (headerScoreVal) headerScoreVal.innerText = score;
-                    if (headerPerfectVal) headerPerfectVal.innerText = perfects;
+                    if (headerPerfectVal) headerPerfectVal.innerText = perfects + " 👑";
                 }
             }).catch(err => console.log("Load error"));
     }
@@ -133,7 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (timerEl) timerEl.innerText = elapsed.toFixed(3);
     }
 
-    // ORIGINAL START MATNI VA +2 PT TIZIMI BILAN START TUGMASI
     if (actionBtn) {
         actionBtn.addEventListener('click', () => {
             if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
@@ -153,26 +160,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (finalTime === 1.000) {
                     perfects += 1; addedScore = 10;
-                    feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "#00f0ff";
+                    feedbackEl.innerText = "👑 PERFECT HIT! +10 $ZAGRA"; feedbackEl.style.color = "#ffd700";
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (finalTime >= 0.995 && finalTime <= 1.005) {
-                    addedScore = 2; // SIZ AYTGANDEK ADOLATLI +2 PT!
-                    feedbackEl.innerText = "🔥 EXCELLENT! +2 PT"; feedbackEl.style.color = "#00f0ff";
+                    addedScore = 2; 
+                    feedbackEl.innerText = "🔥 EXCELLENT! +2 $ZAGRA"; feedbackEl.style.color = "#00f0ff";
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
-                    feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
+                    feedbackEl.innerText = "⚡ CLOSE HIT! +1 $ZAGRA"; feedbackEl.style.color = "#7f00ff";
                 } else {
                     feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "#ff007f";
                 }
                 
                 score += addedScore; 
                 if (headerScoreVal) headerScoreVal.innerText = score;
-                if (headerPerfectVal) headerPerfectVal.innerText = perfects;
+                if (headerPerfectVal) headerPerfectVal.innerText = perfects + " 👑";
                 saveUserData();
             }
         });
     }
 
+    // REYTING JADVALI INTEGRATSIYASI
     function loadLiveLeaderboard(type) {
         const listEl = document.getElementById('leaderboard');
         if (!listEl) return;
@@ -188,18 +196,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.forEach((p, i) => {
                 let li = document.createElement('li'); li.className = 'leaderboard-item';
-                let displayVal = type === 'perfects' ? p.perfects + " Kings" : p.score + " Scores";
+                let displayVal = type === 'perfects' ? p.perfects + " Kings 👑" : p.score + " $ZAGRA";
                 let isMeStyle = p.id == user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
                 
-                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#00f0ff;':'color:#ff007f;'}">${displayVal}</strong>`;
+                li.innerHTML = `<span class="rank">#${i+1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type==='perfects'?'color:#ffd700;':'color:#00f0ff;'}">${displayVal}</strong>`;
                 listEl.appendChild(li);
             });
 
             let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
-            const myRankEl = document.getElementById('my-rank');
-            if (myRankEl) myRankEl.innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? "1" : myRankPosition}`;
-        }).catch(err => {
-            listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
-        });
-    }
-});
