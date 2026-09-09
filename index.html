@@ -15,6 +15,7 @@
             --magenta: #ff007f;
             --text-main: #ffffff;
             --text-sub: #8fa0b5;
+            --gold: #ffd700;
         }
 
         * {
@@ -35,7 +36,6 @@
             height: 100vh;
         }
 
-        /* Tepadagi original statistika va profil paneli */
         .header-profile {
             display: flex;
             align-items: center;
@@ -68,10 +68,16 @@
         .header-stats {
             font-size: 14px;
             color: var(--text-sub);
+            text-align: right;
         }
 
         .header-stats strong {
             color: var(--cyan);
+        }
+        
+        .header-stats .gold-text {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
         }
 
         .content-container {
@@ -101,7 +107,7 @@
             font-family: monospace;
             color: var(--text-main);
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin: 60px 0;
+            margin: 40px 0;
         }
 
         #feedback {
@@ -109,11 +115,10 @@
             font-weight: bold;
             color: var(--text-sub);
             height: 25px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             letter-spacing: 1px;
         }
 
-        /* ORQASIDA KO'K TO'RBURCHAK CHIQMAYDIGAN ORIGINAL DUMALOQ TUGMA */
         .action-btn {
             width: 200px;
             height: 200px;
@@ -178,7 +183,7 @@
             background: var(--panel-color);
             border-radius: 12px;
             border: 1px solid #1e293b;
-            max-height: 55vh;
+            max-height: 50vh;
             overflow-y: auto;
         }
 
@@ -194,6 +199,7 @@
         .leaderboard-item:last-child { border-bottom: none; }
         .leaderboard-item .rank { color: var(--text-sub); font-weight: bold; width: 35px; }
 
+        /* MULTI-TAB NAVIGATION PANEL */
         .nav-tabs {
             display: flex;
             background-color: var(--panel-color);
@@ -203,16 +209,24 @@
 
         .tab-btn {
             flex: 1;
-            padding: 15px 0;
+            padding: 12px 0;
             background: none;
             border: none;
             color: var(--text-sub);
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tab-btn span.icon {
+            font-size: 18px;
         }
 
         .tab-btn.active {
@@ -274,18 +288,27 @@
             color: white; border: none; border-radius: 8px;
             font-weight: bold; font-size: 15px; cursor: pointer;
         }
+        
+        .locked-text {
+            color: var(--text-sub);
+            font-size: 16px;
+            text-align: center;
+            margin-top: 100px;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Tepadagi original statistika va profil paneli -->
     <div class="header-profile">
         <div class="user-info">
             <span id="current-name-display">Loading...</span>
             <button class="edit-btn" id="edit-profile-trigger">✏️</button>
         </div>
         <div class="header-stats">
-            Score: <strong id="header-score-val">0</strong> | Perfects: <strong id="header-perfect-val">0</strong>
+            $ZAGRA: <strong id="header-score-val">0</strong><br>
+            Kings: <strong id="header-perfect-val" class="gold-text">0 👑</strong>
         </div>
     </div>
 
@@ -308,24 +331,18 @@
             </div>
             <ul class="leaderboard-list" id="leaderboard"></ul>
         </div>
-    </div>
 
-    <!-- NICKNAME TAHRIRLASH MODALI -->
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-box">
-            <button class="modal-close" id="modal-close-btn">✕</button>
-            <h3>Edit Nickname</h3>
-            <input type="text" id="nickname-input" placeholder="New Nickname..." maxlength="15">
-            <button class="save-btn" id="save-nickname-btn">SAVE CHANGES</button>
+        <!-- FRIENDS VIEW (PHASE 2) -->
+        <div class="view-panel" id="friends-view">
+            <div class="locked-text">
+                👥 **FRIENDS SYSTEM**<br>
+                <span style="font-size:12px; color:var(--magenta);">Unlocks in Phase 2! Invite friends & earn $ZAGRA! 🚀</span>
+            </div>
         </div>
-    </div>
 
-    <!-- ORIGINAL PASTKI NAVIGATSIYA TUGMALARI -->
-    <nav class="nav-tabs">
-        <button class="tab-btn active" id="tab-game">GAME</button>
-        <button class="tab-btn" id="tab-rank">RANKING</button>
-    </nav>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        <!-- TASKS VIEW (PHASE 3) -->
+        <div class="view-panel" id="tasks-view">
+            <div class="locked-text">
+                ⚡ **CYBER QUESTS**<br>
+                <span style="font-size:12px; color:var(--magenta);">Unlocks in Phase 3! Complete tasks to multiply coins! 🪙</span>
+            </div>
