@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json"
     };
 
-    // HTML ELEMENTLARINI CHAQIRISH
+    // HTML ELEMENTLARINI CHAQIRISH (FAQAT REALT TURGAN ELEMENTLAR!)
     const timerEl = document.getElementById('timer'), feedbackEl = document.getElementById('feedback');
     const actionBtn = document.getElementById('action-btn');
     const headerScoreVal = document.getElementById('header-score-val'), headerPerfectVal = document.getElementById('header-perfect-val');
@@ -44,17 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const saveNicknameBtn = document.getElementById('save-nickname-btn');
 
+    // FAQAT ORIGINAL HTMLDA BOR BO'LGAN 2 TALA TUGMANI CHAQIRAMIZ! (ZANJIR MUKAMMAL)
     const tabGame = document.getElementById('tab-game'), tabRank = document.getElementById('tab-rank');
     const gameView = document.getElementById('game-view'), rankView = document.getElementById('rank-view');
     const subPerfects = document.getElementById('sub-perfects'), subScores = document.getElementById('sub-scores');
 
-    // ISMNI KUTISHOLARSIZ SHU ZAHOTI DEFIZGA CHIQARAMIZ
+    // ISMNI KUTISHLARSIZ SHU ZAHOTI EKRANGA CHIQARAMIZ
     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
     
     // Orqa fonda ma'lumotlarni yuklashni boshlaymiz
     loadUserData();
 
-    // NAVIGATSIYA TUGMALARI ARXITEKTURASI
+    // NAVIGATSIYA TUGMALARI ARXITEKTURASI (XATOSIZ ISHLAYDI)
     if (tabGame) {
         tabGame.addEventListener('click', () => {
             tabGame.classList.add('active'); if (tabRank) tabRank.classList.remove('active');
@@ -103,14 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // BAZADAN JONLI MASSIV ELEMENTINI TO'G'RI O'QISH (HAL ETUVCHI QISM!)
+    // BAZADAN JONLI MASSIV ELEMENTINI TO'G'RI O'QISH
     function loadUserData() {
         if (!user_id) return;
         fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${user_id}`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const pilotData = data[0]; // XATOLIK 100% TO'G'RILANDI! MASSIVNING 1-ELEMENTI O'QILMOQDA.
+                    const pilotData = data[0]; // MASSIVNING 1-ELEMENTI TO'G'RI O'QILMOQDA
                     user_name = pilotData.name || user_name;
                     localStorage.setItem("zagra_user_nickname", user_name);
                     if (currentNameDisplay) currentNameDisplay.innerText = user_name;
@@ -202,4 +203,3 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             let myRankPosition = data.findIndex(p => p.id == user_id) + 1;
-            const myRankEl = document.getElementById('my-rank');
