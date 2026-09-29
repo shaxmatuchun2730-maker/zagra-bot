@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }).catch(err => console.log("Load error"));
     }
 
-  function saveUserData() {
+ function saveUserData() {
     if (!user_name || user_name.trim() === "") return;
     
     const payload = [{
@@ -125,21 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
         score: score,
         perfects: perfects
     }];
-
-    fetch(`${SUPABASE_URL}/rest/v1/players`, {
-        method: 'POST',
-        headers: {
-            ...headers,
-            "Prefer": "return=representation,resolution=merge-duplicates"
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        if (headerScoreVal) headerScoreVal.innerText = score;
-        if (headerPerfectVal) headerPerfectVal.innerText = perfects;
-    })
-    .catch(err => console.log("Direct save sync error"));
-}
 
     fetch(`${SUPABASE_URL}/rest/v1/players`, {
         method: 'POST',
