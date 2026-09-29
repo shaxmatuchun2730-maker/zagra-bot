@@ -117,16 +117,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function saveUserData() {
-        if (!user_name || user_name.trim() === "") return;
-        fetch(`${SUPABASE_URL}/rest/v1/rpc/save_zagra_player`, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ p_id: user_id, p_name: user_name, p_score: score, p_perfects: perfects })
-        })
-        .then(() => loadUserData())
-        .catch(err => console.log("Save error"));
-    }
+    if (!user_name || user_name.trim() === "") return;
+    
+    const payload = [{
+        id: user_id,
+        name: user_name,
+        score: score,
+        perfects: perfects
+    }];
 
+    fetch(`${SUPABASE_URL}/rest/v1/players`, {
+        method: 'POST',
+        headers: {
+            ...headers,
+            "Prefer": "return=representation,resolution=merge-duplicates"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        if (headerScoreVal) headerScoreVal.innerText = score;
+        if (headerPerfectVal) headerPerfectVal.innerText = perfects;
+    })
+    .catch(err => console.log("Direct save sync error"));
+}
     function updateTimer() {
         let elapsed = (performance.now() - startTime) / 1000;
         if (elapsed >= 1.5) startTime = performance.now();
