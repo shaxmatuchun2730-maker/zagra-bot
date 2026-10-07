@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
         
-        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, { method: 'GET', headers })
+        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=1000`, { method: 'GET', headers })
         .then(res => res.json())
         .then(data => {
             listEl.innerHTML = '';
