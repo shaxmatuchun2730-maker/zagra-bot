@@ -172,6 +172,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (finalTime >= 0.995 && finalTime <= 1.005) {
                     addedScore = 2; // +2 BAL PLATFORMA ADOLATI
                     feedbackEl.innerText = "🔥 EXCELLENT! +2 PT"; feedbackEl.style.color = "#00f0ff";
+                     AdController.show().then(() => {
+     score += 2;
+     if (headerScoreVal) headerScoreVal.innerText = score;
+     saveUserData();
+ }).catch((err) => {
+     console.log("Reklama yopildi yoki xato:", err);
+ });
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
                     feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
