@@ -165,32 +165,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 let finalTime = timerEl ? parseFloat(timerEl.innerText) : 0;
                 let addedScore = 0;
 
-                if (finalTime === 1.000) {
-                    perfects += 1; addedScore = 10;
-                    feedbackEl.innerText = "🎯 PERFECT HIT! +10"; feedbackEl.style.color = "#00f0ff";
+               if (finalTime === 1.000) {
+                    perfects += 1;
+                    addedScore = 10;
+                    feedbackEl.innerText = "🎯 PERFECT HIT! +10";
+                    feedbackEl.style.color = "#00f0ff";
                     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                     } else if (finalTime >= 0.995 && finalTime <= 1.005) {
-        addedScore = 2;
-        feedbackEl.innerText = "🔥 EXCELLENT! +2 PT"; feedbackEl.style.color = "#00FFAF";
-        AdController.show().then(() => {
-            score += 2;
-            if (headerScoreVal) headerScoreVal.innerText = score;
-            saveUserData();
-        }).catch((err) => {
-            console.log("Reklama xatosi:", err);
-        });
-    }        
-     else if (finalTime >= 0.990 && finalTime <= 1.010) {
+                    score += addedScore;
+                    if (headerScoreVal) headerScoreVal.innerText = score;
+                    if (headerPerfectVal) headerPerfectVal.innerText = perfects;
+                    saveUserData();
+                } else if (finalTime >= 0.995 && finalTime <= 1.005) {
+                    addedScore = 2;
+                    feedbackEl.innerText = "🔥 EXCELLENT! +2 PT";
+                    feedbackEl.style.color = "#00FFAF";
+                    AdController.show().then(() => {
+                        score += 2;
+                        if (headerScoreVal) headerScoreVal.innerText = score;
+                        saveUserData();
+                    }).catch((err) => {
+                        console.log("Reklama xatosi:", err);
+                    });
+                    score += addedScore;
+                    if (headerScoreVal) headerScoreVal.innerText = score;
+                    saveUserData();
+                } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
-                    feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
+                    feedbackEl.innerText = "⚡ SO CLOSE! +1 PT";
+                    feedbackEl.style.color = "#00FF66";
+                    score += addedScore;
+                    if (headerScoreVal) headerScoreVal.innerText = score;
+                    saveUserData();
                 } else {
-                    feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN"; feedbackEl.style.color = "#ff007f";
+                    feedbackEl.innerText = "❌ MISSED IT! TRY AGAIN";
+                    feedbackEl.style.color = "#ff007f";
                 }
-                
-                score += addedScore; 
-                if (headerScoreVal) headerScoreVal.innerText = score;
-                if (headerPerfectVal) headerPerfectVal.innerText = perfects;
-                saveUserData();
             }
         });
     }
