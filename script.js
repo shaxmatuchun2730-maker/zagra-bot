@@ -1,3 +1,4 @@
+const AdController = window.Adsgram.init({ blockId: "52411" });
 document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
