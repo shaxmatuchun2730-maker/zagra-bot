@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
                    } else if (finalTime >= 0.995 && finalTime <= 1.005) {
         addedScore = 2; // +2 BALL PLATFORMA ADOLATI
         feedbackEl.innerText = "🔥 EXCELLENT! +2 PT"; feedbackEl.style.color = "#00FFAF";
-        AdController.show().then(() => {
+               AdController.show().then(() => {
             score += 2;
             if (headerScoreVal) headerScoreVal.innerText = score;
             saveUserData();
