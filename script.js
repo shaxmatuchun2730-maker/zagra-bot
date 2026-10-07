@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
             saveUserData();
         }).catch((err) => {
             console.log("Reklama xatosi:", err);
-        });
+        }
 
                 } else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
