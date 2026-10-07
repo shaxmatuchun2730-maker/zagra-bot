@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Reklama xatosi:", err);
         });
          }           
-    } else if (finalTime >= 0.990 && finalTime <= 1.010) {
+     else if (finalTime >= 0.990 && finalTime <= 1.010) {
                     addedScore = 1;
                     feedbackEl.innerText = "🔥 SO CLOSE! +1 PT"; feedbackEl.style.color = "#0072ff";
                 } else {
