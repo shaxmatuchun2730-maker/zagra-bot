@@ -1,4 +1,3 @@
-const AdController = window.Adsgram.init({ blockId: "52411" });
 document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
@@ -179,13 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     addedScore = 2;
                     feedbackEl.innerText = "🔥 EXCELLENT! +2 PT";
                     feedbackEl.style.color = "#00FFAF";
-                    AdController.show().then(() => {
-                        score += 2;
-                        if (headerScoreVal) headerScoreVal.innerText = score;
-                        saveUserData();
-                    }).catch((err) => {
-                        console.log("Reklama xatosi:", err);
-                    });
                     score += addedScore;
                     if (headerScoreVal) headerScoreVal.innerText = score;
                     saveUserData();
