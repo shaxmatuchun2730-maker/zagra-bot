@@ -26,7 +26,7 @@ function koorsatReklama(davomEtishOyin) {
         })
         .catch((error) => {
             console.log("Reklama ko'rilmadi yoki xato berdi:", error);
-            davomEtishOyin(); // Xato bo'lsa ham o'yin qotmaydi!
+            davomEtishOyin(); // Xato bo'lsa ham o'yin baribir qotmaydi!
         });
 }
 // -------------------------------------------------
