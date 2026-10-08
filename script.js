@@ -15,7 +15,7 @@ function koorsatReklama(davomEtishOyin) {
 
     // debug: true — test rejimi. Declined bo'lsa ham ko'k sinov oynasini ochadi
     const AdController = window.Adsgram.init({ 
-      blockId: "int-52622", 
+            blockId: "int-52622",
         debug: true 
     });
 
