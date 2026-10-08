@@ -231,15 +231,17 @@ function koorsatReklama(davomEtishOyin) {
     }
 
     // REYTING RO'YXATI MOTORI
-    function loadLiveLeaderboard(type) {
-        const listEl = document.getElementById('leaderboard');
-        if (!listEl) return;
-        listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing leaderboard...</li>';
+ function loadLeaderboard(type) {
+    const listEl = document.getElementById('leaderboard');
+    if (!listEl) return;
+    listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing leaderboard...</li>';
 
-        let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
-        
-        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=1000`, { method: 'GET', headers })
-        .then(res => res.json())
+    let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
+
+    // --- REYTINGDAN OLDIN REKLAMANI CHAQIRISH (XAVFSIZ) ---
+    koorsatReklama(() => {
+        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, { method: 'GET', headers })
+            .then(res => res.json())
         .then(data => {
             listEl.innerHTML = '';
             if (!data || data.length === 0) { listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>'; return; }
