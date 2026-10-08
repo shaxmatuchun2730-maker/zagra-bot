@@ -231,7 +231,7 @@ function koorsatReklama(davomEtishOyin) {
     }
 
     // REYTING RO'YXATI MOTORI
- function loadLeaderboard(type) {
+function loadLeaderboard(type) {
     const listEl = document.getElementById('leaderboard');
     if (!listEl) return;
     listEl.innerHTML = '<li style="text-align:center; padding:20px; color:#556375;">Syncing leaderboard...</li>';
@@ -240,7 +240,7 @@ function koorsatReklama(davomEtishOyin) {
 
     // --- REYTINGDAN OLDIN REKLAMANI CHAQIRISH (MUTLAQO XAVFSIZ) ---
     koorsatReklama(() => {
-        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=1000`, { method: 'GET', headers })
+        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, { method: 'GET', headers })
             .then(res => res.json())
             .then(data => {
                 listEl.innerHTML = '';
