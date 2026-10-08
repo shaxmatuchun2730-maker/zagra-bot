@@ -41,7 +41,7 @@ function koorsatReklama(davomEtishOyin) {
     }
 
     // Laptop va telefon ismini to'g'ri zaxiralash
-    let user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "Cyber_Pilot_" + Math.floor(1000 + Math.random() * 9000);
+    let user_name = localStorage.getItem("zagra_user_nickname") || tg?.initDataUnsafe?.user?.first_name || "New_Player_" + Math.floor(1000 + Math.random() * 9000);
     localStorage.setItem("zagra_user_nickname", user_name);
 
     // BAZA INTEGRATSIYASI
