@@ -4,7 +4,33 @@ document.addEventListener("DOMContentLoaded", () => {
         tg.expand();
         tg.ready();
     }
+// --- ADSGRAM REKLAMA TIZIMI (MUTLAQO XAVFSIZ) ---
+function koorsatReklama(davomEtishOyin) {
+    // Agar Adsgram internetdan yuklanmagan bo'lsa, o'yin to'xtamaydi
+    if (!window.Adsgram) {
+        console.log("Adsgram yuklanmadi, o'yin davom etadi.");
+        davomEtishOyin();
+        return;
+    }
 
+    // 52411 — sizning rasmda ko'ringan UnitID raqamingiz
+    // debug: true — test rejimi (o'yin qotib qolishini oldini oladi)
+    const AdController = window.Adsgram.init({ 
+        blockId: "52411", 
+        debug: true 
+    });
+
+    AdController.show()
+        .then((result) => {
+            console.log("Reklama muvaffaqiyatli tugadi:", result);
+            davomEtishOyin(); // Reklamadan keyin o'yin davom etishi uchun
+        })
+        .catch((error) => {
+            console.log("Reklama ko'rilmadi yoki xato berdi:", error);
+            davomEtishOyin(); // Xato bo'lsa ham o'yin baribir qotmaydi!
+        });
+}
+// -------------------------------------------------
     let score = 0, perfects = 0, isRunning = false, startTime = 0, timerInterval = null;
     
     // AKKAUNT DOIMIYLIGI KAFOLATI
