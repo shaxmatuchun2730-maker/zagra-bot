@@ -6,15 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 // --- ADSGRAM REKLAMA TIZIMI (MUTLAQO XAVFSIZ) ---
 function koorsatReklama(davomEtishOyin) {
-    // Agar Adsgram internetdan yuklanmagan bo'lsa, o'yin to'xtamaydi
+    // Agar Adsgram yuklanmagan bo'lsa, o'yin to'xtamaydi
     if (!window.Adsgram) {
         console.log("Adsgram yuklanmadi, o'yin davom etadi.");
         davomEtishOyin();
         return;
     }
 
-    // 52411 — sizning rasmda ko'ringan UnitID raqamingiz
-    // debug: true — test rejimi (o'yin qotib qolishini oldini oladi)
+    // debug: true — test rejimi. Declined bo'lsa ham ko'k sinov oynasini ochadi
     const AdController = window.Adsgram.init({ 
         blockId: "52411", 
         debug: true 
@@ -23,11 +22,11 @@ function koorsatReklama(davomEtishOyin) {
     AdController.show()
         .then((result) => {
             console.log("Reklama muvaffaqiyatli tugadi:", result);
-            davomEtishOyin(); // Reklamadan keyin o'yin davom etishi uchun
+            davomEtishOyin(); 
         })
         .catch((error) => {
             console.log("Reklama ko'rilmadi yoki xato berdi:", error);
-            davomEtishOyin(); // Xato bo'lsa ham o'yin baribir qotmaydi!
+            davomEtishOyin(); // Xato bo'lsa ham o'yin qotmaydi!
         });
 }
 // -------------------------------------------------
