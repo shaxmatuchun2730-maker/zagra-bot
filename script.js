@@ -17,7 +17,7 @@ function koorsatReklama(davomEtishOyin) {
        // debug: false — Real, pullik reklamalarni yoqish
     const AdController = window.Adsgram.init({ 
         blockId: "int-52622", 
-        debug: false 
+        debug: true
     });
 
     AdController.show()
