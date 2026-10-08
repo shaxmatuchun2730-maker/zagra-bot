@@ -238,35 +238,32 @@ function loadLeaderboard(type) {
 
     let orderQuery = type === 'perfects' ? 'perfects.desc' : 'score.desc';
 
-    // --- REYTINGDAN OLDIN REKLAMANI CHAQIRISH (MUTLAQO XAVFSIZ) ---
-    koorsatReklama(() => {
-        fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, { method: 'GET', headers })
-            .then(res => res.json())
-            .then(data => {
-                listEl.innerHTML = '';
-                if (!data || data.length === 0) {
-                    listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>';
-                    return;
-                }
+    fetch(`${SUPABASE_URL}/rest/v1/players?order=${orderQuery}&limit=100`, { method: 'GET', headers })
+        .then(res => res.json())
+        .then(data => {
+            listEl.innerHTML = '';
+            if (!data || data.length === 0) {
+                listEl.innerHTML = '<li style="padding:15px; color:#556375;">No pilots registered yet.</li>';
+                return;
+            }
 
-                data.forEach((p, i) => {
-                    let li = document.createElement('li');
-                    li.className = 'leaderboard-item';
-                    let displayVal = type === 'perfects' ? p.perfects : p.score;
-                    let isMeStyle = p.id === user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
+            data.forEach((p, i) => {
+                let li = document.createElement('li');
+                li.className = 'leaderboard-item';
+                let displayVal = type === 'perfects' ? p.perfects : p.score;
+                let isMeStyle = p.id === user_id ? "color:#fff; text-shadow:0 0 10px #00f0ff; font-weight:bold;" : "";
 
-                    li.innerHTML = `<span class="rank">${i + 1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type === 'perfects' ? 'color:#00f0ff;' : 'color:#ff007f;'}">${displayVal}</strong>`;
-                    listEl.appendChild(li);
-                });
-
-                let myRankPosition = data.findIndex(p => p.id === user_id) + 1;
-                const myRankEl = document.getElementById('my-rank');
-                if (myRankEl) {
-                    myRankEl.innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? '1' : myRankPosition}`;
-                }
-            })
-            .catch(err => {
-                listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
+                li.innerHTML = `<span class="rank">${i + 1}</span><span style="${isMeStyle}">${p.name}</span><strong style="${type === 'perfects' ? 'color:#00f0ff;' : 'color:#ff007f;'}">${displayVal}</strong>`;
+                listEl.appendChild(li);
             });
-    });
+
+            let myRankPosition = data.findIndex(p => p.id === user_id) + 1;
+            const myRankEl = document.getElementById('my-rank');
+            if (myRankEl) {
+                myRankEl.innerText = `Your Absolute Global Position: Top-${myRankPosition === 0 ? '1' : myRankPosition}`;
+            }
+        })
+        .catch(err => {
+            listEl.innerHTML = '<li style="text-align:center; padding:24px; color:#ff007f;">Connection Error.</li>';
+        });
 }
