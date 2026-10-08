@@ -114,11 +114,19 @@ function koorsatReklama(davomEtishOyin) {
                 alert("Nickname must be at least 2 characters!");
                 return;
             }
+                      // --- REKLAMA QO'SHISH (BALL BERILMAYDIGAN TO'G'RI VARIANT) ---
             user_name = inputVal;
-            localStorage.setItem("zagra_user_nickname", user_name);
-            if (currentNameDisplay) currentNameDisplay.innerText = user_name;
-            if (profileModal) profileModal.style.display = 'none';
-            saveUserData();
+            localStorage.setItem("zagra_user_name", user_name);
+            
+            // Reklamani chaqiramiz. U tugagach ism saqlanib, profil yopiladi (ball berilmaydi)
+            koorsatReklama(() => {
+                if (currentNameDisplay) currentNameDisplay.innerText = user_name;
+                if (profileModal) profileModal.style.display = 'none';
+                
+                saveUserData(); // Faqat yangi ismni bazaga saqlash
+            });
+            // ------------------------------------------------------------
+
         });
     }
 
